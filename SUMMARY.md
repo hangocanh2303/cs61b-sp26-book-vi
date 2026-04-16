@@ -4,7 +4,7 @@
 * [Contributors](<README (1).md>)
 * [DISCLAIMER](disclaimer.md)
 * [1. Introduction](1.-introduction/README.md)
-  * [1.1 Your First Java Program](1.-introduction/1.1-your-first-java-program.md)
+  * [1.1 Your First Java Program](1.-introduction/vi/1.1-your-first-java-program.md)
   * [1.2 Basic Java Features](1.-introduction/1.2-basic-java-features.md)
   * [1.3 Java Workflow](1.-introduction/1.3-java-workflow.md)
 * [2. Defining and Using Classes](2.-defining-and-using-classes.md)
