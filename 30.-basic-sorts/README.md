@@ -1,2 +1,0 @@
-# 30. Basic Sorts
-
