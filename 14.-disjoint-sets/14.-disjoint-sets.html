@@ -1,0 +1,687 @@
+<h1 id="introduction">14.1 Introduction</h1>
+<p>People like you and I reside in our countries and live here. We can
+think of each country as a set and all of the people within it as
+elements within that set. The same person cannot live in two different
+countries simultaneously. What we have just modeled is a
+<strong>disjoint set</strong>. </p>
+<blockquote>
+<p>Two sets are named <em>disjoint sets</em> if they have no elements in
+common. A Disjoint-Sets (or Union-Find) data structure keeps track of a
+fixed number of elements partitioned into a number of <em>disjoint
+sets</em>. The data structure has two operations:</p>
+</blockquote>
+<ol type="1">
+<li><code>connect(x, y)</code>: connect <code>x</code> and
+<code>y</code>. Also known as <code>union</code></li>
+<li><code>isConnected(x, y)</code>: returns true if <code>x</code> and
+<code>y</code> are connected (i.e. part of the same set).</li>
+</ol>
+<p>A Disjoint Sets data structure has a fixed number of elements that
+each start out in their own subset. By calling
+<code>connect(x, y)</code> for some elements <code>x</code> and
+<code>y</code>, we merge subsets together.</p>
+<p>For example, say we have four elements which we’ll call A, B, C, D.
+To start off, each element is in its own set:</p>
+<figure>
+<img src="../.gitbook/assets/image (23).png" alt="">
+<figcaption>
+<p>
+{A} {B} {C} {D}
+</p>
+</figcaption>
+</figure>
+<p>After calling <code>connect(A, B)</code>:</p>
+<p><br />
+<br />
+</p>
+<figure>
+<img src="../.gitbook/assets/image (126).png" alt="">
+<figcaption>
+<p>
+{A, B} {C} {D}
+</p>
+</figcaption>
+</figure>
+<p>Note that the subsets A and B were merged. Let’s check the output
+some <code>isConnected</code> calls:</p>
+<p><br />
+<code>isConnected(A, B) -&gt; true</code></p>
+<p><code>isConnected(A, C) -&gt; false</code></p>
+<p>After calling <code>connect(A, D)</code>:</p>
+<p><br />
+<br />
+</p>
+<figure>
+<img src="../.gitbook/assets/image (104).png" alt="">
+<figcaption>
+<p>
+{A, B, D} {C}
+</p>
+</figcaption>
+</figure>
+<p><br />
+We find the set A is part of and merge it with the set D is part of,
+creating one big A, B, D set. C is left alone.</p>
+<p><code>isConnected(A, D) -&gt; true</code><br />
+<code>isConnected(A, C) -&gt; false</code></p>
+<p><br />
+</p>
+<p>With this intuition in mind, let’s formally define what our
+DisjointSets interface looks like. As a reminder, an
+<strong>interface</strong> determines <em>what</em> behaviors a data
+structure should have (but not <em>how</em> to accomplish it). In this
+way, any class that implements the <code>DisjointSets</code> interface
+knows to always include functions: <code>connect(int p, int q)</code>
+and <code>isConnected(int p, int q)</code> as seen below. For now, we’ll
+only deal with sets of non-negative integers. This is not a limitation
+because in production we can assign integer values to anything we would
+like to represent.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">interface</span> DisjointSets <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> connects two items P and Q <span class="co">*/</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> <span class="fu">connect</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">);</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> checks to see if two items are connected <span class="co">*/</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">boolean</span> <span class="fu">isConnected</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">);</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><br />
+But how are we going to save data for these Disjoint sets to see which
+member belongs to it’s corresponding set? What data structures are we
+going to use to represent this awesome data structure? In addition to
+learning about how to implement a fascinating data structure, this
+chapter will be a chance to see how an implementation of a data
+structure evolves. We will discuss four iterations of a Disjoint Sets
+design before being satisfied: <a href="14.2-quick-find.md"><em>Quick
+Find</em></a> <em>→</em> <a href="14.3-quick-union.md"><em>Quick
+Union</em></a> <em>→</em> <a
+href="14.4-weighted-quick-union-wqu.md"><em>Weighted Quick Union
+(WQU)</em></a> <em>→</em> <a
+href="14.5-weighted-quick-union-with-path-compression.md"><em>WQU with
+Path Compression</em></a>. <strong>We will see how design decisions
+greatly affect asymptotic runtime and code complexity.</strong></p>
+<h1 id="quick-find">14.2 Quick Find</h1>
+<h3 id="list-of-sets">List of Sets</h3>
+<p>Intuitively, we might first consider representing Disjoint Sets as a
+list of sets, e.g, <code>List&lt;Set&lt;Integer&gt;&gt;</code>.</p>
+<p>For instance, if we have N=6 elements and nothing has been connected
+yet, our list of sets looks like:
+<code>[{0}, {1}, {2}, {3}, {4}, {5}, {6}]</code>. Looks good. However,
+consider how to complete an operation like <code>connect(5, 6)</code>.
+We’d have to iterate through up to <code>N</code> sets to find 5 and
+<code>N</code> sets to find 6. Our runtime becomes <code>O(N)</code>.
+And, if you were to try and implement this, the code would be quite
+complex.</p>
+<blockquote>
+<p>The lesson to take away is that <strong>initial design decisions
+determine our code complexity and runtime.</strong></p>
+</blockquote>
+<h3 id="quick-find-1">Quick Find</h3>
+<p>Let’s consider another approach using a <em>single array of
+integers</em>.</p>
+<ul>
+<li>The <strong>indices of the array</strong> represent the elements of
+our set.</li>
+<li>The <strong>value at an index</strong> is the set number it belongs
+to.</li>
+</ul>
+<p>For example, we represent <code>{0, 1, 2, 4}, {3, 5}, {6}</code>
+as:<br />
+</p>
+<figure>
+<img src="../.gitbook/assets/image (72).png" alt="">
+<figcaption>
+<p>
+Set 4: {0, 1, 2, 4} | Set 5: {3, 5} | Set 6: {6}
+</p>
+</figcaption>
+</figure>
+<p>The array indices (0…6) are the elements. The value at
+<code>id[i]</code> is the set it belongs to. <em>The specific set number
+doesn’t matter as long as all elements in the same set share the same
+id.</em></p>
+<h3 id="connectx-y"><strong><code>connect(x, y)</code></strong></h3>
+<p>Let’s see how the connect operation would work. Right now,
+<code>id[2] = 4</code> and <code>id[3] = 5</code>. After calling
+<code>connect(2, 3)</code>, all the elements with id 4 and 5 should have
+the same id. Let’s assign them all the value 5 for now:<br />
+</p>
+<figure>
+<img src="../.gitbook/assets/image (102).png" alt="">
+<figcaption>
+<p>
+Set 5: {0, 1, 2, 3, 4, 5} | Set 6: {6}
+</p>
+</figcaption>
+</figure>
+<p><strong><code>isConnected(x, y)</code></strong></p>
+<p>To check <code>isConnected(x, y)</code>, we simply check if
+<code>id[x] == id[y]</code>. Note this is a constant time operation!</p>
+<p><br />
+We call this implementation “Quick Find” because finding if elements are
+connected takes constant time.</p>
+<h3 id="code-runtimes">Code &amp; Runtimes</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> QuickFindDS <span class="kw">implements</span> DisjointSets <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span><span class="op">[]</span> id<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Θ(N) */</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">QuickFindDS</span><span class="op">(</span><span class="dt">int</span> N<span class="op">){</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        id <span class="op">=</span> <span class="kw">new</span> <span class="dt">int</span><span class="op">[</span>N<span class="op">];</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++){</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            id<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> i<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* need to iterate through the array =&gt; Θ(N) */</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">connect</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">){</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> pid <span class="op">=</span> id<span class="op">[</span>p<span class="op">];</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> qid <span class="op">=</span> id<span class="op">[</span>q<span class="op">];</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> id<span class="op">.</span><span class="fu">length</span><span class="op">;</span> i<span class="op">++){</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>id<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> pid<span class="op">){</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                id<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> qid<span class="op">;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Θ(1) */</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">isConnected</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">){</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">(</span>id<span class="op">[</span>p<span class="op">]</span> <span class="op">==</span> id<span class="op">[</span>q<span class="op">]);</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>N = number of elements in our DisjointSets data structure<br />
+</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 47%" />
+<col style="width: 13%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Constructor</th>
+<th><code>connect</code></th>
+<th><code>isConnected</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ListOfSets</td>
+<td>Θ(N)<a href="14.2-quick-find.md#note">¹</a></td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+<tr>
+<td>QuickFind</td>
+<td>Θ(N)</td>
+<td>Θ(N)</td>
+<td>Θ(1)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="note">Note</h3>
+<p>1. We didn’t discuss this but you can reason that having to create N
+distinct sets initially is Θ(N)<a
+href="https://joshhug.gitbooks.io/hug61b/content/chap9/chap92.html#reffn_1">↩︎</a></p>
+<h1 id="quick-union">14.3 Quick Union</h1>
+<p>Suppose we prioritize making the <code>connect</code> operation fast.
+We will still represent our sets with an array. Instead of an id, we
+assign each item the index of its parent. If an item has no parent, then
+it is a ‘root’ and we assign it a negative value.</p>
+<p>This approach allows us to imagine each of our sets as a tree. For
+example, we represent <code>{0, 1, 2, 4}, {3, 5}, {6}</code> as:</p>
+<p> Note that we represent the sets using <strong>only an
+array</strong>. We visualize it ourselves as trees.</p>
+<figure>
+<img src="https://joshhug.gitbooks.io/hug61b/content/chap9/9.3.1.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>For QuickUnion we define a helper function
+<code>find(int item)</code> which returns the root of the tree
+<code>item</code> is in. For example, for the sets above,
+<code>find(4) == 0</code>, <code>find(1) == 0</code>,
+<code>find(5) == 3</code>, etc. Each element has a unique root.</p>
+<p><strong><code>connect(x, y)</code></strong></p>
+<p>To connect two items, we find the set that each item belongs to (the
+roots of their respective trees), and make one the child of the other.
+Example:</p>
+<p><code>connect(5, 2)</code>:</p>
+<ol type="1">
+<li><code>find(5)</code> -&gt; 3</li>
+<li><code>find(2)</code> -&gt; 0</li>
+<li>Set <code>find(5)</code>’s value to <code>find(2)</code> aka
+<code>parent[3] = 0</code></li>
+</ol>
+<p> Note how element 3 now points to element 0, combining the two
+trees/sets into one.</p>
+<figure>
+<img src="https://joshhug.gitbooks.io/hug61b/content/chap9/9.3.2.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>In the best case, if <code>x</code> and <code>y</code> are both roots
+of their trees, then <code>connect(x, y)</code> just makes
+<code>x</code> point to <code>y</code>, a Θ(1) operation! (Hence the
+name QuickUnion)</p>
+<p><strong><code>isConnected(x, y)</code></strong></p>
+<p>If two elements are part of the same set, then they will be in the
+same tree. Thus, they will have the same root. So for
+<code>isConnected(x, y)</code> we simply check if
+<code>find(x) == find(y)</code>.</p>
+<h3 id="performance">Performance
+<a href="#performance" id="performance"></a></h3>
+<p>There is a potential performance issue with QuickUnion: the tree can
+become very long. In this case, finding the root of an item
+(<code>find(item)</code>) becomes very expensive. Consider the tree
+below:</p>
+<p><img
+src="https://joshhug.gitbooks.io/hug61b/content/chap9/9.3.3.png" /></p>
+<p>In the worst case, we have to traverse all the items to get to the
+root, which is a Θ(N) runtime. Since we have to call <code>find</code>
+for both <code>connect</code> and <code>isConnected</code>, the runtime
+for both is upper bounded by O(N).</p>
+<h3 id="summary-and-code">Summary and Code
+<a href="#summary-and-code" id="summary-and-code"></a></h3>
+<p>N = number of elements in our DisjointSets data structure</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Constructor</th>
+<th><code>connect</code></th>
+<th><code>isConnected</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QuickUnion</td>
+<td>Θ(N)</td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+<tr>
+<td>QuickFind</td>
+<td>Θ(N)</td>
+<td>Θ(N)</td>
+<td>Θ(1)</td>
+</tr>
+<tr>
+<td>QuickUnion</td>
+<td>Θ(N)</td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+</tbody>
+</table>
+<p>From the runtime chart, QuickUnion seems worse than QuickFind! Note
+however that O(N) as an <strong>upper bound</strong>. When our trees are
+balanced, both <code>connect</code> and <code>isConnected</code> perform
+reasonably well. In the next section we’ll see how to <em>guarantee</em>
+they perform well.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> QuickUnionDS <span class="kw">implements</span> DisjointSets <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span><span class="op">[]</span> parent<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">QuickUnionDS</span><span class="op">(</span><span class="dt">int</span> num<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        parent <span class="op">=</span> <span class="kw">new</span> <span class="dt">int</span><span class="op">[</span>num<span class="op">];</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> num<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            parent<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> <span class="fu">find</span><span class="op">(</span><span class="dt">int</span> p<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="op">(</span>parent<span class="op">[</span>p<span class="op">]</span> <span class="op">&gt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> parent<span class="op">[</span>p<span class="op">];</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> p<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">connect</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> i <span class="op">=</span> <span class="fu">find</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> j<span class="op">=</span> <span class="fu">find</span><span class="op">(</span>q<span class="op">);</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        parent<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> j<span class="op">;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">isConnected</span><span class="op">(</span><span class="dt">int</span> p<span class="op">,</span> <span class="dt">int</span> q<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fu">find</span><span class="op">(</span>p<span class="op">)</span> <span class="op">==</span> <span class="fu">find</span><span class="op">(</span>q<span class="op">);</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="weighted-quick-union-wqu">14.4 Weighted Quick Union (WQU)</h1>
+<p>Improving on Quick Union relies on a key insight: whenever we call
+<code>find</code>, we have to climb to the root of a tree. Thus, the
+shorter the tree the faster it takes!</p>
+<p><strong>New rule:</strong> whenever we call <code>connect</code>, we
+always link the root of the smaller tree to the larger tree.</p>
+<p>Following this rule will give your trees a maximum height of <span
+class="math display"><em>l</em><em>o</em><em>g</em><em>N</em></span>,
+where N is the number of elements in our Disjoint Sets. How does this
+affect the runtime of <code>connect</code> and
+<code>isConnected</code>?</p>
+<p>Let’s illustrate the benefit of this with an example. Consider
+connecting the two sets T1 and T2 below:</p>
+<p><img
+src="https://joshhug.gitbooks.io/hug61b/content/chap9/9.4.1.png" /></p>
+<p>We have two options for connecting them:</p>
+<p> The first option we link T1 to T2. In the second, we link T2 to
+T1.</p>
+<figure>
+<img src="https://joshhug.gitbooks.io/hug61b/content/chap9/9.4.2.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>The <strong>second option is preferable</strong> as it only has a
+height of 2, rather than 3. By our new rule, we would choose the second
+option as well because T2 is smaller than T1 (size of 3 compared to
+6).</p>
+<p>We determine smaller / larger by the number of items in a tree. Thus,
+when connecting two trees we need to know their size (or weight). We can
+store this information in the root of the tree by replacing the
+<code>-1</code>’s with <code>-(size of tree)</code>. </p>
+<p><strong>Maximum height: Log N</strong></p>
+<p>Following the above rule ensures that the <em>maximum</em> height of
+any tree is Θ(log N). N is the number of elements in our Disjoint Sets.
+<strong>By extension, the runtimes of <code>connect</code> and
+<code>isConnected</code> are bounded by O(log N).</strong> </p>
+<p>Why <span
+class="math display"><em>l</em><em>o</em><em>g</em><em>N</em></span>?
+The video above presents a more visual explanation. Here’s an optional
+mathematical explanation why the maximum height is <span
+class="math display"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>N</em></span>.
+Imagine any element <span class="math display"><em>x</em></span> in tree
+<span class="math display"><em>T</em>1</span>. The depth of <span
+class="math display"><em>x</em></span> increases by 1 only when <span
+class="math display"><em>T</em>1</span> is placed below another tree
+<span class="math display"><em>T</em>2</span>. When that happens, the
+size of the resulting tree will be at least double the size of <span
+class="math display"><em>T</em>1</span> because <span
+class="math display"><em>s</em><em>i</em><em>z</em><em>e</em>(<em>T</em>2) ≥ <em>s</em><em>i</em><em>z</em><em>e</em>(<em>T</em>1)</span>.
+The tree with <span class="math display"><em>x</em></span> can double at
+most <span
+class="math display"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>N</em></span>
+times until we’ve reached a total of N items (<span
+class="math display">2<sup><em>l</em><em>o</em><em>g</em><sub>2</sub><em>N</em></sup> = <em>N</em></span>).
+So we can double up to <span
+class="math display"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>N</em></span>​​
+times and each time, our tree adds a level → maximum <span
+class="math display"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>N</em></span>
+levels. </p>
+<p>You may be wondering why we don’t link trees based off of height
+instead of weight. It turns out this is more complicated to implement
+and gives us the same Θ(log N) height limit.</p>
+<h3 id="summary">Summary
+<a href="#summary-and-code" id="summary-and-code"></a></h3>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Constructor</th>
+<th><code>connect</code></th>
+<th><code>isConnected</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QuickUnion</td>
+<td>Θ(N)</td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+<tr>
+<td>QuickFind</td>
+<td>Θ(N)</td>
+<td>Θ(N)</td>
+<td>Θ(1)</td>
+</tr>
+<tr>
+<td>QuickUnion</td>
+<td>Θ(N)</td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+<tr>
+<td>Weighted Quick Union</td>
+<td>Θ(N)</td>
+<td>O(log N)</td>
+<td>O(log N)</td>
+</tr>
+</tbody>
+</table>
+<p>N = number of elements in our DisjointSets data structure</p>
+<h1 id="weighted-quick-union-with-path-compression">14.5 Weighted Quick
+Union with Path Compression</h1>
+<p>The clever insight is realizing that whenever we call
+<code>find(x)</code> we have to traverse the path from <code>x</code> to
+root. So, along the way we can connect all the items we visit to their
+root at no extra asymptotic cost.</p>
+<p>Connecting all the items along the way to the root will help make our
+tree shorter with each call to <code>find</code>.</p>
+<p>Recall that <strong>both <code>connect(x, y)</code> and
+<code>isConnected(x, y)</code> always call <code>find(x)</code> and
+<code>find(y)</code>.</strong> Thus, after calling <code>connect</code>
+or <code>isConnected</code> enough, essentially all elements will point
+directly to their root.</p>
+<p>By extension, the average runtime of <code>connect</code> and
+<code>isConnected</code> becomes <strong>almost constant</strong> in the
+long term! This is called the <em>amortized runtime</em>.</p>
+<p>More specifically, for M operations on N elements, WQU with Path
+Compression is in <span
+class="math display"><em>O</em>(<em>N</em> + <em>M</em>(<em>l</em><em>g</em> * <em>N</em>))</span>.
+lg* is the <a
+href="https://en.wikipedia.org/wiki/Iterated_logarithm">iterated
+logarithm</a> which is less than 5 for any real-world input.</p>
+<h3 id="summary-1">Summary <a href="#summary" id="summary"></a></h3>
+<p>N: number of elements in Disjoint Set</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th><code>isConnected</code></th>
+<th><code>connect</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quick Find</td>
+<td>Θ(1)</td>
+<td>Θ(N)</td>
+</tr>
+<tr>
+<td>Quick Union</td>
+<td>O(N)</td>
+<td>O(N)</td>
+</tr>
+<tr>
+<td>Weighted Quick Union (WQU)</td>
+<td>O(log N)</td>
+<td>O(log N)</td>
+</tr>
+<tr>
+<td>WQU with Path Compression</td>
+<td>O(α(N))*</td>
+<td>O(α(N))*</td>
+</tr>
+</tbody>
+</table>
+<p>*behaves as constant in long term.</p>
+<h1 id="exercises">14.6 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li><a
+href="https://drive.google.com/file/d/1GuTG5O-2SSudWgm47rIi4orkmmpU4Apa/view?usp=share_link">Problem
+2</a> from the Spring 2016 Midterm 2.</li>
+<li><a
+href="https://drive.google.com/file/d/1uE1QlF4YguWVp8m8UJ97R2xPC4b1NnQ5/view?usp=sharing">Problem
+1d</a>from the Spring 2015 Midterm 2.</li>
+<li>Suppose we have the following WQU with path compression. What is the
+height of the tree after we call <code>isConnected(8, 9)</code>?</li>
+</ol>
+<figure>
+<img src="../.gitbook/assets/ch14-exercises-pathcompression.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<details>
+<summary>
+Problem 1
+</summary>
+<p><a
+href="https://drive.google.com/file/d/1KXLkjx1e8QPiu-waBJFwmcT5IToMHQK5/view?usp=sharing">Solutions</a>
+are linked here and on the course website.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><a
+href="https://drive.google.com/file/d/1IYt4VbzdX4dTekh6cYAC8tigpJ_LgljV/view?usp=sharing">Solutions</a>
+are linked here and on the course website.</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>The resulting tree will have height 1. Every node along the path from
+<code>0</code> to <code>9</code> will now have parent <code>0</code>,
+and similarly every node along the path from <code>0</code> to
+<code>8</code> will also have parent <code>0</code>.</p>
+</details>
+<h2 id="conceptual">Conceptual</h2>
+<ol type="1">
+<li>Which of the following arrays could represent a valid weighted quick
+union structure?
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><code>[8, 0, 4, 0, 0, 4, 0, 4, 2, 0]</code></label></li>
+<li><label><input
+type="checkbox" /><code>[4, -8, 8, 2, 1, -2, 1, 1, 4, 5]</code></label></li>
+<li><label><input
+type="checkbox" /><code>[3, 3, 5, 9, 3, 6, 3, 4, 1, -10]</code></label></li>
+<li><label><input
+type="checkbox" /><code>[2, -10, 1, 1, 1, 1, 1, 2, 1, 7]</code></label></li>
+</ul></li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><code>[8, 0, 4, 0, 0, 4, 0, 4, 2, 0]</code>: invalid.
+There is a cycle 8 –&gt; 2 –&gt; 4 –&gt; 0 –&gt; 8.</label></li>
+<li><label><input
+type="checkbox" /><code>[4, -8, 8, 2, 1, -2, 1, 1, 4, 5]</code>:
+invalid. The maximum height is <span
+class="math display">4 &gt; log<sub>2</sub>(10)</span>.</label></li>
+<li><label><input
+type="checkbox" /><code>[3, 3, 5, 9, 3, 6, 3, 4, 1, -10]</code>:
+invalid. The size of the tree rooted at 9 (excluding the subtree rooted
+at 3) is less than the size of the tree rooted at 3. As such, when we
+connected the two trees, 3 should have been the parent of 9 instead of
+the other way around.</label></li>
+<li><label><input
+type="checkbox" /><code>[2, -10, 1, 1, 1, 1, 1, 2, 1, 7]</code>:
+valid.</label></li>
+</ul>
+</details>
+<h2 id="procedural">Procedural</h2>
+<ol type="1">
+<li>Define a <em>fully connected</em> WQU as one where all elements are
+in the same set. What is the maximum and minimum height of a fully
+connected WQU with 6 elements?</li>
+<li>Suppose we have a WQU of height H. What is the minimum number of
+elements that must be in the WQU?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>The minimum height is always 1 (all elements are connected to the
+root). The maximum height is 2 (we take the floor of <span
+class="math display">log<sub>2</sub>6</span>).</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>We know that <span
+class="math display"><em>H</em> ≤ log<sub>2</sub><em>N</em></span>,
+where <span class="math display"><em>N</em></span> is the number of
+elements in the WQU. As such, <span
+class="math display"><em>N</em> ≥ 2<sup><em>H</em></sup></span>.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li><a
+href="https://drive.google.com/file/d/1yWyRp7QTizspTp9dsKz5yxE6bSf9YUIi/view?usp=sharing">Problem
+3</a> from the Spring 2017 Midterm 2.</li>
+<li>Suppose we create a WQU with <span
+class="math display"><em>N</em></span>items, then we perform <span
+class="math display"><em>M</em><sub><em>C</em></sub></span> union
+operations and <span
+class="math display"><em>M</em><sub><em>U</em></sub></span> union
+operations. Using big O notation, what is the runtime of this sequence
+of operations?</li>
+<li>Using the same variables as problem 2, describe a sequence of
+operations that would result in a runtime of <span
+class="math display"><em>O</em>(<em>N</em> + <em>M</em><sub><em>U</em></sub> + <em>M</em><sub><em>C</em></sub>)</span>.</li>
+<li>Write a <code>int find(int p)</code> method for the WQU with path
+compression. It should perform path compression as described in lecture:
+any node on the path from root to our target node should have its parent
+reset to the root. It takes in the target node <code>p</code> and
+returns the root of the tree <code>p</code> is in.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p><a
+href="https://drive.google.com/file/d/1b99XARlZxg3NMfeSAVt2yzDzwSEcASq3/view?usp=sharing">Solutions</a>
+are linked here and on the course website.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><span
+class="math display"><em>O</em>(<em>N</em> + (<em>M</em><sub><em>U</em></sub> + <em>M</em><sub><em>C</em></sub>)log <em>N</em>)</span>.
+Each operation takes <span class="math display">log <em>N</em></span>
+time, and we need <span class="math display"><em>N</em></span> time to
+initialize an empty array of size <span
+class="math display"><em>N</em></span>.</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>Initialize the array as usual. Then, connect the items in sequence:
+<code>connect(0, 1)</code>, <code>connect(0, 2)</code>,
+<code>connect(0, 3)</code>, up to <code>connect(0, N)</code>. This
+results in a height-1 tree, on which <code>connect</code> and
+<code>isConnected</code> run in constant time.</p>
+</details>
+<details>
+<summary>
+Problem 4
+</summary>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">find</span><span class="op">(</span><span class="dt">int</span> p<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> root <span class="op">=</span> p<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>root <span class="op">!=</span> parent<span class="op">[</span>root<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        root <span class="op">=</span> parent<span class="op">[</span>root<span class="op">];</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>p <span class="op">!=</span> root<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> newp <span class="op">=</span> parent<span class="op">[</span>p<span class="op">];</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        parent<span class="op">[</span>p<span class="op">]</span> <span class="op">=</span> root<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> newp<span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> root<span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</details>
+<h1 id="disjoint-sets">14. Disjoint Sets</h1>

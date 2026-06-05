@@ -1,0 +1,427 @@
+<h1 id="binary-search-trees">15.1 Binary Search Trees</h1>
+<p>Linked Lists are great, but it takes a long time to search for an
+item, even if the list is sorted! What if the item is at the end of the
+list? That would take linear time!</p>
+<p>We know that for an array, we can use binary search to find an
+element faster. Specifically, in <span
+class="math display">log <em>n</em></span> time. For a short explanation
+of binary search, check out this <a
+href="https://www.geeksforgeeks.org/binary-search/">link</a>.</p>
+<p>In binary search, we know the list is sorted, so we can use this
+information to narrow our search. First, we look at the middle element.
+If it is bigger than the element we are searching for, we look to the
+left of it. If it is smaller than the element we are searching for, we
+look to the right. We then look at the middle element of the respective
+halves and repeat the process until we find the element we are looking
+for (or don’t find it because the list doesn’t contain it).</p>
+<p>But how do we run binary search for a linked list? We would have to
+traverse all the way to the middle in order to check the element there,
+which takes linear time just on its own!</p>
+<p>One optimization we can implement is to have a reference to the
+middle node. This way, we can get to the middle in constant time. Then,
+if we flip the nodes’ pointers, which allows us to traverse to both the
+left and right halves, we can decrease our runtime by half!</p>
+<figure>
+<img src="../.gitbook/assets/image (57).png" alt="">
+<figcaption>
+<p>
+A linked list with a middle pointer
+</p>
+</figcaption>
+</figure>
+<p>But we can further optimize by adding pointers to the middle of each
+recursive half like so. Now, if you stretch this structure vertically,
+you will see a tree! This specific tree is called a <strong>binary
+tree</strong> because each juncture splits in 2.</p>
+<figure>
+<img src="../.gitbook/assets/image (11).png" alt="">
+<figcaption>
+<p>
+A linked list with recursive middle pointers is a binary tree!
+</p>
+</figcaption>
+</figure>
+<p>{% embed url=“https://www.youtube.com/watch?v=AcRKQOe0zYg” %}</p>
+<h1 id="bst-definitions">15.2 BST Definitions</h1>
+<p>Trees are composed of nodes and edges that connect those nodes. </p>
+<p><strong>Constraint</strong>: there is only one path between any two
+nodes.</p>
+<p>In some trees, we select a <strong>root</strong> node which is a node
+that has no parents.</p>
+<p>A tree also has <strong>leaves</strong>, which are nodes with no
+children.</p>
+<p>In the picture below, the green structures are valid trees, while the
+pink structure is not (since it has a cycle).</p>
+<figure>
+<img src="../.gitbook/assets/image (58).png" alt="">
+<figcaption>
+<p>
+Examples of valid and invalid trees
+</p>
+</figcaption>
+</figure>
+<p>Relating this to the original tree structure we came up with earlier,
+we can now introduce new constraints to the already existing
+constraints. This creates more specific types of trees, two examples
+being Binary Trees and Binary Search Trees.</p>
+<ul>
+<li><strong>Binary Trees</strong>: in addition to the above
+requirements, also hold the binary property constraint. That is, each
+node has either 0, 1, or 2 children.</li>
+<li><strong>Binary Search Trees</strong>: in addition to all of the
+above requirements, also hold the property that For every node X in the
+tree:
+<ul>
+<li>Every key in the left subtree is less than X’s key.</li>
+<li>Every key in the right subtree is greater than X’s key. **Remember
+this property!! We will reference it a lot throughout the duration of
+this module and 61B.</li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (139).png" alt="">
+<figcaption>
+<p>
+A valid BST: every key in the left subtree is smaller than its parent,
+and every key in the right subtree is larger.
+</p>
+</figcaption>
+</figure>
+<p>Here is the BST module we’ll be using for the rest of this
+chapter:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span> <span class="kw">class</span> BST<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="bu">Key</span> key<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> BST left<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> BST right<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">BST</span><span class="op">(</span><span class="bu">Key</span> key<span class="op">,</span> BST left<span class="op">,</span> BST Right<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">key</span> <span class="op">=</span> key<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">left</span> <span class="op">=</span> left<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">right</span> <span class="op">=</span> right<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">BST</span><span class="op">(</span><span class="bu">Key</span> key<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">key</span> <span class="op">=</span> key<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="bst-operations">15.3 BST Operations</h1>
+<h3 id="search">Search</h3>
+<p>To search for something, we employ binary search, which is made easy
+due to the BST property. </p>
+<p>We know that the BST is structured such that all elements to the
+right of a node are greater and all elements to the left are smaller.
+Knowing this, we can start at the root node and compare it with the
+element, X, that we are looking for. If X is greater to the root, we
+move on to the root’s right child. If its smaller, we move on to the
+root’s left child. We repeat this process recursively until we either
+find the item or we get to a leaf, in which case the tree does not
+contain the item.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> BST <span class="fu">find</span><span class="op">(</span>BST T<span class="op">,</span> <span class="bu">Key</span> sk<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> <span class="op">(</span>T <span class="op">==</span> <span class="kw">null</span><span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">null</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> <span class="op">(</span>sk<span class="op">.</span><span class="fu">equals</span><span class="op">(</span>T<span class="op">.</span><span class="fu">key</span><span class="op">))</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> T<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>   <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sk ≺ T<span class="op">.</span><span class="fu">key</span><span class="op">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="fu">find</span><span class="op">(</span>T<span class="op">.</span><span class="fu">left</span><span class="op">,</span> sk<span class="op">);</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>   <span class="cf">else</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="fu">find</span><span class="op">(</span>T<span class="op">.</span><span class="fu">right</span><span class="op">,</span> sk<span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>If our tree is relatively “bushy”, the find operation will run in
+<span class="math display">log <em>n</em></span> time because the height
+of the tree is <span class="math display">log <em>n</em></span>.</p>
+<h3 id="insert">Insert</h3>
+<p>We <strong>always</strong> insert at a leaf node!</p>
+<p>First, we search in the tree for the node. If we find it, then we
+don’t do anything. If we don’t find it, we will be at a leaf node
+already. At this point, we can just add the new element to either the
+left or right of the leaf, preserving the BST property.</p>
+<p>{% embed url=“https://www.youtube.com/watch?v=otDvoMb8UqE” %}</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> BST <span class="fu">insert</span><span class="op">(</span>BST T<span class="op">,</span> <span class="bu">Key</span> ik<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>T <span class="op">==</span> <span class="kw">null</span><span class="op">)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">BST</span><span class="op">(</span>ik<span class="op">);</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>ik ≺ T<span class="op">.</span><span class="fu">key</span><span class="op">)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    T<span class="op">.</span><span class="fu">left</span> <span class="op">=</span> <span class="fu">insert</span><span class="op">(</span>T<span class="op">.</span><span class="fu">left</span><span class="op">,</span> ik<span class="op">);</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>ik ≻ T<span class="op">.</span><span class="fu">key</span><span class="op">)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    T<span class="op">.</span><span class="fu">right</span> <span class="op">=</span> <span class="fu">insert</span><span class="op">(</span>T<span class="op">.</span><span class="fu">right</span><span class="op">,</span> ik<span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> T<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="delete">Delete</h3>
+<p>Deleting from a binary tree is a little bit more complicated because
+whenever we delete, we need to make sure we reconstruct the tree and
+still maintain its BST property. Let’s break this problem down into
+three categories:</p>
+<ul>
+<li>the node we are trying to delete has no children</li>
+<li>has 1 child</li>
+<li>has 2 children</li>
+</ul>
+<h4 id="deletion-no-children">Deletion: No Children</h4>
+<p>If the node has no children, it is a leaf, and we can just delete its
+parent pointer and the node will eventually be swept away by the <a
+href="https://stackoverflow.com/questions/3798424/what-is-the-garbage-collector-in-java">garbage
+collector</a>.</p>
+<h4 id="deletion-one-child">Deletion: One Child</h4>
+<p>If the node only has one child, we know that the child maintains the
+BST property with the parent of the node because the property is
+recursive to the right and left subtrees. Therefore, we can just
+reassign the parent’s child pointer to the node’s child and the node
+will eventually be garbage collected.</p>
+<h4 id="deletion-two-children">Deletion: Two Children</h4>
+<p>If the node has two children, the process becomes a little more
+complicated because we can’t just assign one of the children to be the
+new root. This might break the BST property.</p>
+<p>Instead, we choose a new node to replace the deleted one.</p>
+<p>We know that the new node must:</p>
+<ul>
+<li>be &gt; than everything in left subtree.</li>
+<li>be &lt; than everything right subtree.</li>
+</ul>
+<p>In the below tree, we show which nodes would satisfy these
+requirements given that we are trying to delete the <code>dog</code>
+node.</p>
+<figure>
+<img src="../.gitbook/assets/image (7).png" alt="">
+<figcaption>
+<p>
+Possible candidates to replace <code>dog</code> after deletion
+</p>
+</figcaption>
+</figure>
+<p>To find these nodes, you can just take the right-most node in the
+left subtree or the left-most node in the right subtree. Then, we
+replace the <code>dog</code> node with either <code>cat</code> or
+<code>elf</code> and then remove the old <code>cat</code> or
+<code>elf</code> node.</p>
+<p>This is called <strong>Hibbard deletion</strong>, and it gloriously
+maintains the BST property amidst a deletion.</p>
+<h1 id="bsts-as-sets-and-maps">15.4 BSTs as Sets and Maps</h1>
+<p>We can use a BST to implement the <code>Set</code> ADT. If we use a
+BST, we can decrease the runtime of <code>contains</code> to <span
+class="math display">log (<em>n</em>)</span> because of the BST property
+which enables us to use binary search!</p>
+<p>We can also make a binary tree into a map by having each BST node
+hold <code>(key,value)</code> pairs instead of singular values. We will
+compare each element’s key in order to determine where to place it
+within our tree.</p>
+<h1 id="bst-performance">15.5 BST Performance</h1>
+<h2 id="tree-height">Tree Height</h2>
+<p>One unforunate feature of BSTs is that they range from a best-case
+“bushy” tree to a worst-case “spindly” tree. </p>
+<p>In the best case, our tree will have height <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span>,
+whereas in the worst case our tree has a height of <span
+class="math display"><em>Θ</em>(<em>N</em>)</span>, at which point it
+basically becomes a linked list. For example, <code>contains</code> on a
+“spindly” BST would take linear time.</p>
+<p>Both trees below have a height H = 3, yet the left tree is able to
+hold many more items than the left.</p>
+<figure>
+<img src="../.gitbook/assets/image (65).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h1 id="big-o-vs.-worst-case">15.6 Big O vs. Worst Case</h1>
+<p>Consider the following statements about BSTs. Which of the following
+are true?</p>
+<ol type="1">
+<li>The worst-case height of a BST is <span
+class="math display"><em>Θ</em>(<em>N</em>)</span>.</li>
+<li>BST height is <span
+class="math display"><em>O</em>(<em>N</em>)</span>.</li>
+<li>BST height is <span
+class="math display"><em>O</em>(<em>N</em><sup>2</sup>)</span>.</li>
+</ol>
+<p>The answer is that all three statements are true. BSTs always have a
+height that is linear or better, and a linear height is obviously “less
+than” the quadratic upper bound in the last point.</p>
+<p>However, a more tricky question is which of the three statements is
+<em>the most informative</em>. </p>
+<p>The answer here is the first statement. Theta is always a more
+informative statement than big O.</p>
+<p>Think about theta as similar to <span class="math display">=</span>.
+When we say some function <span
+class="math display"><em>F</em>(<em>N</em>) ∈ <em>t</em><em>h</em><em>e</em><em>t</em><em>a</em>(<em>N</em>)</span>
+we mean it grows exactly linearly.</p>
+<p>By contrast, you should think of <span
+class="math display"><em>O</em></span> as <span
+class="math display"> &lt; =</span>. If we say some function <span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em>)</span>,
+the we mean it grows at a linear rate or slower.</p>
+<p>As a specific example, suppose we know that <span
+class="math display"><em>f</em>(<em>N</em>)</span> is one of these
+functions: <span class="math display">3<em>N</em></span>, <span
+class="math display">4<em>l</em><em>o</em><em>g</em><em>N</em> + 6</span>.
+If I tell you that <span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em>)</span>
+you have no idea which function we’re talking about. But if I say <span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>t</em><em>h</em><em>e</em><em>t</em><em>a</em>(<em>N</em>)</span>,
+you know immediately which one we mean.</p>
+<p>For an analogy, consider the following statements about the
+worst-case cost of a hotel room:</p>
+<ol type="1">
+<li>The most expensive room is $639/night.</li>
+<li>The most expensive room is less than or equal to $2000/night. </li>
+</ol>
+<p>Here, we see that the first statement gives us exact information,
+whereas the second statement does not. In the second statement, the most
+expensive room could be $2000, $10, or anywhere in between. </p>
+<p>However, <em>both are statements about the worst case</em>. Applying
+this to asymptotic notation, this means that we can refer to the worst
+case with <span class="math display"><em>Θ</em></span>, <span
+class="math display"><em>O</em></span>, or even <span
+class="math display"><em>Ω</em></span>. <strong>Big O is not the same as
+the worst case!</strong></p>
+<h2 id="using-big-o">Using Big O</h2>
+<p>If <span class="math display"><em>Θ</em></span> is always more
+informative than <span class="math display"><em>O</em></span>, then why
+do we bother using Big O notation at all? There are several reasons:</p>
+<ul>
+<li>We can make broader statements. For example, saying “binary search
+is <span class="math display"><em>O</em>(log <em>N</em>)</span> is
+correct, but saying”binary search tree is <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span>”
+would not be correct, since it can be constant in certain
+scenarios.</li>
+<li>Sometimes, it is not possible or extremely difficult to determine
+the exact runtime. In such cases, we would still like to provide a
+generalized upper bound.</li>
+</ul>
+<h1 id="summary">15.7 Summary</h1>
+<p>Abstract data types (ADTs) are defined in terms of operations, not
+implementation.Several useful ADTs:</p>
+<ul>
+<li>Disjoint Sets, Map, Set, List.</li>
+<li>Java provides Map, Set, List interfaces, along with several
+implementations.</li>
+</ul>
+<p>We’ve seen two ways to implement a Set (or Map):</p>
+<ul>
+<li>ArraySet: Θ(N) operations in the worst case.</li>
+<li>BST: Θ(logN) operations if tree is balanced.</li>
+</ul>
+<p>BST Implementations:</p>
+<ul>
+<li>Search and insert are straightforward (but insert is a little
+tricky).</li>
+<li>Deletion is more challenging. Typical approach is “Hibbard
+deletion”.</li>
+</ul>
+<h1 id="exercises">15.8 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>What is the best and worst-case height of a BST?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>If we insert everything in order, the worst-case height of <span
+class="math display"><em>Θ</em>(<em>N</em>)</span> results. In the best
+case of a perfectly balanced BST, the best-case height is <span
+class="math display"><em>Θ</em>(log <em>N</em>)</span>.</p>
+</details>
+<h2 id="procedural">Procedural</h2>
+<ol type="1">
+<li>Suppose that a certain BST has keys that are integers between 1 and
+10. During the search for 5, which of the following sequences of keys
+are possible?
+<ul class="task-list">
+<li><label><input type="checkbox" />10, 9, 8, 7, 6, 5</label></li>
+<li><label><input type="checkbox" />4, 10, 8, 7, 5, 3</label></li>
+<li><label><input type="checkbox" />1, 10, 2, 9, 3, 8, 4, 7, 6,
+5</label></li>
+<li><label><input type="checkbox" />1, 2, 6, 8, 9, 5</label></li>
+</ul></li>
+<li>Consider the below BST. What is the result after deleting 4 using
+Hibbard deletion, choosing the sucessor as the replacement?</li>
+</ol>
+<figure>
+<img src="../.gitbook/assets/image (154).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<ol start="3" type="1">
+<li>Suppose we implement the Stack ADT using an array. What is the worst
+case runtime of a <code>push</code> operation with this underlying data
+structure?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<ul class="task-list">
+<li><label><input type="checkbox"
+checked="" /><code>10, 9, 8, 7, 6, 5</code>: possible; this is the
+situation where we have a worst-case linear BST.</label></li>
+<li><label><input type="checkbox" /><code>4, 10, 8, 7, 5, 3</code>: not
+possible; we terminate our search once we reach the desired
+node.</label></li>
+<li><label><input type="checkbox"
+checked="" /><code>1, 10, 2, 9, 3, 8, 4, 7, 6, 5</code>: possible; the
+idea is that we should always search in the correct “direction” of our
+target node. If our target node is greater than our current node, then
+we should go to the right, and our next node should be larger. If our
+target node is less than our current node, then we should go to the
+left, and our next node should be smaller.</label></li>
+<li><label><input type="checkbox" /><code>1, 2, 6, 8, 9, 5</code>: not
+possible; note that this violates the constraint described above. When
+we reach <code>8</code>, we should move to its left branch since our
+target node <code>5</code> is smaller, so we would never search
+<code>9</code>.</label></li>
+</ul>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><img src="../.gitbook/assets/image%20(44).png" /></p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>The worst-case runtime is <span
+class="math display"><em>Θ</em>(<em>N</em>)</span>, since a
+<code>push</code> might cause us to resize the underlying array.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>If inserting our data into a BST in random order yields <span
+class="math display">log <em>N</em></span> height with high probability,
+why don’t we just shuffle our data before inserting into the BST?</li>
+<li>When we do Hibbard deletion from a BST, we always choose the
+successor as a replacement. The successor is guaranteed to only have
+zero or one child–why?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Often in real-world applications, we don’t have all our data at once.
+For example, imagine you’re collecting time-based data that you insert
+into a BST each time a new value is reported. There is no easy way to
+shuffle your data when you only get one or a few points at a time.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>By definition, the successor is the maximum value in the subtree.
+Suppose, for the sake of contradiction, that the sucessor had two
+children. Then, it is not the maximum, since it is less than its right
+child. This is a contradiction, since we said the sucessor is the
+maximum value in the subtree. As such, the successor is guaranteed to
+have one child or less (if it has one child, it is its left child).
+Previous 16.6 Summary Next 17. Tree Traversals and Graphs</p>
+</details>
+<h1 id="binary-search-trees-1">15. Binary Search Trees</h1>
+<p>In this Chapter we will discuss:</p>
+<ul>
+<li>Binary Search Tree</li>
+<li>BST Definitions</li>
+<li>BST Operations</li>
+<li>Sets vs. Maps, Summary</li>
+</ul>
