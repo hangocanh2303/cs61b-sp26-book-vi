@@ -1,0 +1,476 @@
+<h1 id="priority-queues">18.1 Priority Queues</h1>
+<p>Binary Search Trees allowed us to efficiently search trees, only
+taking <span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>)</span>
+time. This was because we could eliminate half of the elements of the
+tree at every step of our search. What if we cared more about quickly
+finding the <em>smallest</em> or <em>largest</em> element instead of
+quickly searching?</p>
+<p>Now we come to the Abstract Data Type of a <em>Priority Queue</em>.
+To understand this ADT, consider a bag of items. You can add items to
+this bag, you can remove items from this bag, etc. The one caveat is
+that you can only interact with the smallest items of this bag.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span> <span class="co">(</span>Min<span class="co">)</span> Priority Queue<span class="co">:</span> Allowing tracking and removal of </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">*</span> the smallest item in a priority queue<span class="co">. */</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">interface</span> MinPQ<span class="op">&lt;</span>Item<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> Adds the item to the priority queue<span class="co">. */</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">add</span><span class="op">(</span>Item x<span class="op">);</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> Returns the smallest item in the priority queue<span class="co">. */</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> Item <span class="fu">getSmallest</span><span class="op">();</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> Removes the smallest item from the priority queue<span class="co">. */</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> Item <span class="fu">removeSmallest</span><span class="op">();</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> Returns the size of the priority queue<span class="co">. */</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">size</span><span class="op">();</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="using-priority">Using Priority
+<a href="#using-priority" id="using-priority"></a></h3>
+<p>Where would we actually use this structure or need it?</p>
+<ul>
+<li>Consider the scenario where we are monitoring text messages between
+citizens and want to keep track of unharmonious conversations.</li>
+<li>Each day, you prepare a report of <span
+class="math display"><em>M</em></span> messages that are the most
+unharmonious using a <code>HarmoniousnessComparator</code>.</li>
+</ul>
+<p>Let’s take this approach: Collect all of the messages that we receive
+throughout the day into a single list. Sort this list and return the
+first <span class="math display"><em>M</em></span> messages.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">List</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> <span class="fu">unharmoniousTexts</span><span class="op">(</span>Sniffer sniffer<span class="op">,</span> <span class="dt">int</span> M<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">ArrayList</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span>allMessages <span class="op">=</span> <span class="kw">new</span> <span class="bu">ArrayList</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;();</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="bu">Timer</span> timer <span class="op">=</span> <span class="kw">new</span> <span class="bu">Timer</span><span class="op">();</span> timer<span class="op">.</span><span class="fu">hours</span><span class="op">()</span> <span class="op">&lt;</span> <span class="dv">24</span><span class="op">;</span> <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        allMessages<span class="op">.</span><span class="fu">add</span><span class="op">(</span>sniffer<span class="op">.</span><span class="fu">getNextMessage</span><span class="op">());</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Comparator</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> cmptr <span class="op">=</span> <span class="kw">new</span> <span class="fu">HarmoniousnessComparator</span><span class="op">();</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Collections</span><span class="op">.</span><span class="fu">sort</span><span class="op">(</span>allMessages<span class="op">,</span> cmptr<span class="op">,</span> <span class="bu">Collections</span><span class="op">.</span><span class="fu">reverseOrder</span><span class="op">());</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> allMessages<span class="op">.</span><span class="fu">sublist</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> M<span class="op">);</span></span></code></pre></div>
+<p>Potential downsides? This approach will use <span
+class="math display"><em>Θ</em>(<em>N</em>)</span> space when actuality
+we only really need to use <span
+class="math display"><em>Θ</em>(<em>M</em>)</span> space.</p>
+<p><strong>Exercise 13.1.1.</strong> Complete the method listed above,
+<code>unharmoniousTexts</code> with the same functionality as described
+using only Θ(M) space.</p>
+<h3 id="priority-queue-implementation">Priority Queue Implementation
+<a href="#priority-queue-implementation" id="priority-queue-implementation"></a></h3>
+<p>We solved the same problem using the Priority Queue ADT, making
+memory more efficient. We can observe that the code is slightly more
+complicated, but this is not always the case.</p>
+<p>Remember that ADT are similar interfaces and the implementation is
+still to be defined. Let’s consider possible implementations using the
+data structure implementations we already know, analyzing the
+<strong>worst case</strong> runtimes of our desired operations:</p>
+<ul>
+<li>Ordered Array
+<ul>
+<li><code>add</code>: <span
+class="math display"><em>Θ</em>(<em>N</em>)</span></li>
+<li><code>getSmallest</code>: <span
+class="math display"><em>Θ</em>(1)</span></li>
+<li><code>removeSmallest</code>: <span
+class="math display"><em>Θ</em>(1)</span></li>
+</ul></li>
+<li>Bushy BST
+<ul>
+<li><code>add</code>: <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></li>
+<li><code>getSmallest</code>: <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></li>
+<li><code>removeSmallest</code>: <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></li>
+</ul></li>
+<li>HashTable
+<ul>
+<li><code>add</code>: <span
+class="math display"><em>Θ</em>(1)</span></li>
+<li><code>getSmallest</code>: <span
+class="math display"><em>Θ</em>(<em>N</em>)</span></li>
+<li><code>removeSmallest</code>: <span
+class="math display"><em>Θ</em>(<em>N</em>)</span></li>
+</ul></li>
+</ul>
+<p><strong>Exercise 13.1.2.</strong> Explain each of the runtimes above.
+What are the downfalls of each data structure? Describe a way of
+modifying one of these data structures to improve performance.</p>
+<p>Can we do better than these suggested data structures?</p>
+<h3 id="summary">Summary <a href="#summary" id="summary"></a></h3>
+<ul>
+<li>Priority Queue is an Abstract Data Type that optimizes for handling
+minimum or maximum elements.</li>
+<li>There can be space/memory benefits to using this specialized data
+structure.</li>
+<li>Implementations for ADTs that we currently know don’t give us
+efficient runtimes for PQ operations.
+<ul>
+<li>A binary search tree is the most efficient among the other
+structures</li>
+</ul></li>
+</ul>
+<h1 id="heaps">18.2 Heaps</h1>
+<p>We previously saw that our known data structures with the best
+runtime for our PQ operations was the <em>binary search tree</em>.
+Modifying its structure and the constraints, we can further improve the
+runtime and efficiency of these operations.</p>
+<p>We will define our binary min-heap as being <strong>complete</strong>
+and obeying <strong>min-heap</strong> property:</p>
+<ul>
+<li>Min-heap: Every node is less than or equal to both of its
+children</li>
+<li>Complete: Missing items only at the bottom level (if any), all nodes
+are as far left as possible.</li>
+</ul>
+<p><img
+src="https://joshhug.gitbooks.io/hug61b/content/assets/heap-13.2.1.png" /></p>
+<p>As we can see in the figures above, the green colored heaps are valid
+and the red ones aren’t. The last two aren’t because they violate at
+least one of the properties that we defined above.</p>
+<p>Now let’s consider how this structure lends itself to the abstract
+data type we described in the previous chapter. We will do this through
+analyzing our desired operations.</p>
+<p><strong>Exercise 13.2.1.</strong> Determine how each method of our
+Priority Queue interface will be implemented given this heap structure.
+Don’t write actual code, just pseudocode!</p>
+<h3 id="heap-operations">Heap Operations
+<a href="#heap-operations" id="heap-operations"></a></h3>
+<p>The three methods we care about for the PriorityQueue ADT are
+<code>add</code>, <code>getSmallest</code>, and
+<code>removeSmallest</code>. We will start by conceptually describing
+how these methods can be implemented given our given schema of a
+heap.</p>
+<ul>
+<li><code>add</code>: Add to the end of heap temporarily. Swim up the
+hierarchy to the proper place.
+<ul>
+<li>Swimming involves swapping nodes if child &lt; parent</li>
+</ul></li>
+<li><code>getSmallest</code>: Return the root of the heap (This is
+guaranteed to be the minimum by our <em>min-heap</em> property</li>
+<li><code>removeSmallest</code>: Swap the last item in the heap into the
+root. Sink down the hierarchy to the proper place.
+<ul>
+<li>Sinking involves swapping nodes if parent &gt; child. Swap with the
+smallest child to preserve <em>min-heap</em> property.</li>
+</ul></li>
+</ul>
+<p>Great! We have determined how we will approach the operations
+specified by the PriorityQueue interface in an efficient way. But how do
+we actually code this?</p>
+<p><strong>Exercise 13.2.2.</strong> Give the runtime for each of the
+methods specified above. Worst cases and best cases.</p>
+<h3 id="tree-representation">Tree Representation
+<a href="#tree-representation" id="tree-representation"></a></h3>
+<p>There are many approaches we can take to representing trees.</p>
+<h4 id="approach-1a-1b-and-1c">Approach 1a, 1b, and 1c
+<a href="#approach-1a-1b-and-1c" id="approach-1a-1b-and-1c"></a></h4>
+<p>Let us consider the most intuitive and previously used representation
+for trees. We will create mappings between nodes and their children.
+There are several ways to do this which we will explore right now.</p>
+<ul>
+<li>In approach <strong>Tree1A</strong>, we consider creating pointers
+to our children and storing the value inside of the node object. These
+are hardwired links that give us fixed-width nodes. We can observe the
+code:</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Tree1A<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Key</span> k<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  Tree1A left<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  Tree1A middle<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  Tree1A right<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">...</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The visualization of this type of structure is shown below.</p>
+<figure>
+<img src="../.gitbook/assets/image (128).png" alt="">
+<figcaption>
+<p>
+1a: Fixed-Width Nodes (BSTMap used this approach)
+</p>
+</figcaption>
+</figure>
+<ul>
+<li>Alternatively, in <strong>Tree1B</strong>, we explore the use of
+arrays as representing the mapping between children and nodes. This
+would give us variable-width nodes, but also awkward traversals and
+performance will be worse.</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Tree1B<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Key</span> k<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Tree1B<span class="op">[]</span> children<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">...</span></span></code></pre></div>
+<figure>
+<img src="../.gitbook/assets/image (93).png" alt="">
+<figcaption>
+<p>
+1b: Variable-Width Nodes
+</p>
+</figcaption>
+</figure>
+<ul>
+<li>Lastly, we can use the approach for <strong>Tree1C</strong>. This
+will be slightly different from the usual approaches that we’ve seen.
+Instead of only representing a node’s children, we say that nodes can
+also maintain a reference to their siblings.</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Tree1C<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Key</span> k<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  Tree1C favoredChild<span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  Tree1C sibling<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">...</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<figure>
+<img src="../.gitbook/assets/image (62).png" alt="">
+<figcaption>
+<p>
+1c: Sibling Tree
+</p>
+</figcaption>
+</figure>
+<p>In all of these approaches, we store explicit references to who is
+below us. These explicit references take the form of pointers to the
+actual Tree objects that are our children. Let’s think of more exotic
+approaches that don’t store explicit references to children.</p>
+<h4 id="approach-2">Approach 2
+<a href="#approach-2" id="approach-2"></a></h4>
+<p>Recall the Disjoint Sets ADT. The way that we represented this
+Weighted Quick Union structure was through arrays. For representing a
+tree, we can store the <em>keys</em> array as well as a <em>parents</em>
+array. The keys array represent which index maps to which key, and the
+parents array represents which key is a child of another key.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Tree2<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Key</span><span class="op">[]</span> keys<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span><span class="op">[]</span> parents<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">...</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Take some time to ensure that the tree on the left corresponds to the
+representation in the arrays on the right.</p>
+<p>It’s time to make a very important observation! Based on the
+structure of the tree and the relationship between the array
+representations and the diagram of the tree, we can see:</p>
+<ol type="1">
+<li>The tree is <strong>complete</strong>. This is a property we have
+defined earlier.</li>
+<li>The parents array has a sort of redundant pattern where elements are
+just doubled.</li>
+<li>Reading the level-order of the tree, we see that it matches exactly
+the order of the keys in the <em>keys</em> array.</li>
+</ol>
+<figure>
+<img src="../.gitbook/assets/image (88).png" alt="">
+<figcaption>
+<p>
+Approach 2
+</p>
+</figcaption>
+</figure>
+<p>What does this all mean? We know the parents array is redundant so we
+can ignore it and we know that a tree can be represented by level order
+in an array.</p>
+<h4 id="approach-3">Approach 3
+<a href="#approach-3" id="approach-3"></a></h4>
+<p>In this approach, we assume that our tree is complete. This is to
+ensure that there are no “gaps” inside of our array representation.
+Thus, we will take this complex 2D structure of the tree and flatten it
+into an array.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> TreeC<span class="op">&lt;</span><span class="bu">Key</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Key</span><span class="op">[]</span> keys<span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">...</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<figure>
+<img src="../.gitbook/assets/image (117).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h4 id="swim">Swim <a href="#swim" id="swim"></a></h4>
+<p>Given this implementation, we define the following code for the
+“swim” described in the Heap Operations section.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">void</span> <span class="fu">swim</span><span class="op">(</span><span class="dt">int</span> k<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>keys<span class="op">[</span><span class="fu">parent</span><span class="op">(</span>k<span class="op">)]</span> ≻ keys<span class="op">[</span>k<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">swap</span><span class="op">(</span>k<span class="op">,</span> <span class="fu">parent</span><span class="op">(</span>k<span class="op">));</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">swim</span><span class="op">(</span><span class="fu">parent</span><span class="op">(</span>k<span class="op">));</span>              </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>What does the parent method do? It returns the parent of the given k
+using the representation in Approach 3.</p>
+<p><strong>Exercise 13.2.3.</strong> Write the parent method. For extra
+challenge, try to write the methods for finding the left child and right
+child of a given item.</p>
+<h1 id="pq-implementation">18.3 PQ Implementation</h1>
+<p>The actual implementation, which we will use and the book uses, is
+quite similar to the representation we discussed at the end of the
+previous chapter. The one difference is that we will leave one empty
+spot at the beginning of the array to simplify computation.</p>
+<ul>
+<li><code>leftChild(k)</code>= <span
+class="math display"><em>k</em> * 2</span></li>
+<li><code>rightChild(k)</code>= <span
+class="math display"><em>k</em> * 2 + 1</span></li>
+<li><code>parent(k)</code>= <span
+class="math display"><em>k</em>/2</span></li>
+</ul>
+<h3 id="comparing-to-alternative-implementations">Comparing to
+alternative implementations
+<a href="#comparing-to-alternative-implementations" id="comparing-to-alternative-implementations"></a></h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 21%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Methods</th>
+<th>Ordered Array</th>
+<th>Bushy BST</th>
+<th>Hash Table</th>
+<th>Heap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add</code></td>
+<td><span class="math display"><em>Θ</em>(<em>N</em>)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+<td><span class="math display"><em>Θ</em>(1)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+</tr>
+<tr>
+<td><code>getSmallest</code></td>
+<td><span class="math display"><em>Θ</em>(1)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+<td><span class="math display"><em>Θ</em>(<em>N</em>)</span></td>
+<td><span class="math display"><em>Θ</em>(1)</span></td>
+</tr>
+<tr>
+<td><code>removeSmallest</code></td>
+<td><span class="math display"><em>Θ</em>(<em>N</em>)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+<td><span class="math display"><em>Θ</em>(<em>N</em>)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Awesome! We can see that we have improved our runtime and we have
+also solved the problem of duplicate elements. Couple notes:</p>
+<ul>
+<li>Heap operations are <strong>amortized</strong> analysis, since the
+array will have to resize (not a big deal)</li>
+<li>BST’s can have constant time <code>getSmallest</code> if pointer is
+stored to smallest element</li>
+<li>Array-based heaps take around 1/3rd the memory it takes to represent
+a heap using approach 1A (direct pointers to children)</li>
+</ul>
+<p><strong>Exercise 13.3.1</strong> Some lingering implementation
+questions:</p>
+<ol type="1">
+<li>How will the PQ know how to order the items? Say we had a PQ of
+dogs, would it order by weight or breed?</li>
+<li>Is there a way to allow for a flexibility of orderings?</li>
+<li>What could we do to make a MinPQ into a MaxPQ?</li>
+</ol>
+<h1 id="summary-1">18.4 Summary</h1>
+<p><strong>Priority Queue.</strong> A Max Priority Queue (or PQ for
+short) is an ADT that supports at least the insert and delete-max
+operations. A MinPQ supposert insert and delete-min.</p>
+<p><strong>Heaps.</strong> A max (min) heap is an array representation
+of a binary tree such that every node is larger (smaller) than all of
+its children. This definition naturally applies recursively, i.e. a heap
+of height 5 is composed of two heaps of height 4 plus a parent.</p>
+<p><strong>Tree Representations.</strong> Know that there are many ways
+to represent a tree, and that we use Approach 3b (see lecture slides)
+for representing heaps, since we know they are complete.</p>
+<p><strong>Running times of various PQ implementations.</strong> Know
+the running time of the three primary PQ operations for an unordered
+array, ordered array, and heap implementation.</p>
+<h1 id="exercises">18.5 Exercises</h1>
+<h2 id="procedural">Procedural</h2>
+<ol type="1">
+<li>Represent the following heap as an array.</li>
+</ol>
+<p><img src="../.gitbook/assets/image%20(86).png" /></p>
+<ol start="2" type="1">
+<li>Consider the above heap. What range of values, when inserted, will
+cause the maximum number of swaps?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>To convert a heap into an array, we simply read the values
+top-to-bottom and left-to-right. As such, the correct representation is
+<code>[0, 5, 1, 8, 8, 6, 2]</code>.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>Since <code>0</code> is currently the root, any value
+<code>&lt; 0</code> when inserted will have to swapped to from the
+bottom of the tree to the top, resulting in the maximum number of swaps.
+Thus, the range is <span class="math display">[−∞, 0)</span>.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Consider an externally-chained hashmap. If there are many hash
+collisions, what data structure would be most efficient in storing the
+key-value pairs at each bucket?</li>
+<li>Consider an array sorted in descending order. Is this a valid heap?
+If so, which type: min-heap, or max-heap?</li>
+<li>Suppose that we store the root of a heap at the <code>0</code>th
+index in our array. For an arbitrary index <code>k</code>, compute the
+indices of its children and parent.</li>
+<li>Explain how you would implement a stack using a priority queue.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>An LLRB would be the best choice. Even if all items end up in same
+bucket, the LLRB will be balanced, resulting in a <span
+class="math display"><em>O</em>(log <em>n</em>)</span> search time where
+<span class="math display"><em>n</em></span> is the number of items in
+the bucket. Any other choice of data structure (linked list, array,
+binary search tree) could have linear search time in the word case
+within the bucket.</p>
+<p>Note: Using an LLRB to store buckets requires that the keys be
+comparable.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>An array sorted in descending order is a max-heap (the root is the
+maximum value, and values decrease in level order).</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>The children would be <code>2k + 1</code> and <code>2k + 2</code>.
+The parent would be <code>(k - 1) / 2</code> (note that this assumes
+integer division).</p>
+</details>
+<details>
+<summary>
+Problem 4
+</summary>
+<p>To implement a stack using a priority queue, keep a counter that
+increments each time you insert an item. Recently inserted items will
+always have higher priority, so they will be removed first.</p>
+</details>
+<h1 id="heaps-and-priority-queues">18. Heaps and Priority Queues</h1>

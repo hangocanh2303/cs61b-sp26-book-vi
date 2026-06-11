@@ -1,0 +1,322 @@
+<h1 id="hash-code">24.2 Hash Code</h1>
+<p>We face the problem that not every object in Java can easily be
+converted to a number. However, the key idea behind hashing is the
+transformation of any object into a numeric representation. The key is
+to have a hashing function transform our keys into different values, and
+convert that number into an index to then access the array. </p>
+<p>We achieve this through our own implementation of a
+<code>hashCode()</code> function, with a return value of an
+<code>int</code> type. This <code>int</code> type is our <em>hash
+value</em>. </p>
+<p>The built-in String class in Java, for example, might have the
+following code block:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> <span class="bu">String</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">//implementation here</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Based on this example, we can call <code>key.hashCode()</code> to
+generate an integer hash code for a <code>String</code> instance called
+<code>key</code>. </p>
+<h2 id="memory-inefficiency-in-hash-codes">Memory Inefficiency in Hash
+Codes</h2>
+<p>An issue mentioned earlier is memory inefficiency: for a small range
+of hash values, we can get away with an array that individuates each
+hash value. That is, every index in the array would represent a unique
+hash value. This works well if our indices are small and close to zero.
+But remember that Java’s 32-bit integer type can support numbers
+anywhere between -2,147,483,648 and 2,147,483,647. Now, most of the
+time, our data won’t use anywhere near that many values. But even if we
+only wanted to support special characters, our array would still need to
+be 1,112,064 elements long!</p>
+<p>Instead, we’ll slightly modify our indexing strategy. Let’s say we
+only want to support an array of length 10 so as to avoid allocating
+excessive amounts of memory. How can we turn a number that is
+potentially millions or billions large into a value between 0 and 9,
+inclusive?</p>
+<h3 id="wrapping">Wrapping!</h3>
+<p>The <strong>modulus operator (%)</strong> allows us to achieve this.
+</p>
+<p><em>Review</em>: The result of the modulo operator is like a
+remainder in fractional division. For example, <code>65 % 10</code>
+returns <code>5</code> because after dividing 65 by 10, we are left with
+a remainder of 5. Thus as other examples, <code>3 % 10 = 3</code>,
+<code>20 % 10 = 0</code>, and <code>19 % 10 = 9</code>. For an intuitive
+understanding of this, think about how we used the modulo operator in
+Project 1: Deques to ensure you avoided <code>IndexOutOfBounds</code>
+Exceptions and could accurately index into your deque via the concept of
+“wrapping around” the array. </p>
+<p>Returning back to our original problem, we want to be able to convert
+any number to a value between 0 and 9, inclusive. Given our discussion
+on the modulo operator, we can see that any number mod 10 will return an
+integer value between 0 and 9. This is what we need to index into an
+array of size 10!</p>
+<p>More generally, we can locate the correct index for any key with the
+following:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Math</span><span class="op">.</span><span class="fu">floorMod</span><span class="op">(</span>key<span class="op">.</span><span class="fu">hashCode</span><span class="op">(),</span> array<span class="op">.</span><span class="fu">length</span><span class="op">)</span></span></code></pre></div>
+<p>where <code>array</code> is the underlying array representing our
+hash table.</p>
+<p><em>Quick Note</em>: In Java, the <code>Math.floorMod</code> function
+will perform the modulus operation while correctly accounting for
+negative integers, whereas <code>%</code> does not.</p>
+<h1 id="valid-good-hashcodes">24.3 “Valid” &amp; “Good” Hashcodes</h1>
+<h2 id="valid-hashcodes">Valid Hashcodes!</h2>
+<p>You may see this term in discussions and potentially on exams. What
+exactly makes a hash code “valid”? There are two properties:</p>
+<ol type="1">
+<li><em><strong>Deterministic</strong></em><strong>:</strong> The
+<code>hashCode()</code> function of two objects A and B who are equal to
+each other (<code>A.equals(B) == true</code>) have the same hashcode.
+<em>This also means the hash function cannot rely on attributes of the
+object that are not reflected in the</em> <code>.equals()</code>
+<em>method.</em></li>
+<li><em><strong>Consistent</strong></em><strong>:</strong> The
+<code>hashCode()</code> function returns the same integer every time it
+is called on the same instance of an object. This means the
+<code>hashCode()</code> function must be independent of
+time/stopwatches, random number generators, or any methods that would
+not give us a consistent <code>hashCode()</code> across multiple
+<code>hashCode()</code> function calls on the same object instance.</li>
+</ol>
+<p>Note that there are no requirements that state that unequal objects
+should have different hash function values.</p>
+<p>One could argue that these two requirements are in fact the same
+requirement. We can restate the requirement of consistency. Imagine we
+make a pointer named <code>A</code> to an object <code>O</code> at 12:00
+pm and a pointer named <code>B</code> to this same object <code>O</code>
+at 1:00 pm. We know that the hash code should return the same integer
+for both objects, due to the consistency requirement. However, how do we
+formally define our statement “this same object <code>O</code>” above?
+Technically, the only reason we consider <code>B</code> to be pointing
+to the same thing as <code>A</code> is because of the
+<code>.equals()</code>method! This is starting to sound a lot like the
+determinism requirement.</p>
+<h2 id="good-hashcodes">Good Hashcodes!</h2>
+<p>You’ll probably see this term a lot as well. But what makes a
+hashcode “good”? There are a few properties that can make a good
+<code>hashCode()</code>:</p>
+<ol type="1">
+<li>The <code>hashCode()</code> function must be valid.</li>
+<li>The <code>hashCode()</code> function values should be spread as
+uniformly as possible over the set of all integers.</li>
+<li>The <code>hashCode()</code> function should be relatively quick to
+compute [ideally O(1) constant time mathematical operations]</li>
+</ol>
+<p>Now let’s think more specifically about the impact of the hashing
+function. In general, we assume most hash functions will be “relatively
+quick”. Why do we make this assumption? Given how intrinsic the hashing
+function is to our data structure, the runtime of this function will
+have a significant effect on the overall runtime of our data structure.
+This means we want our hash code to be “easily” computable (ideally
+constant time), so that we may maintain the O(1) runtime characteristic
+that makes hashing so special and efficient!</p>
+<h1 id="handling-collisions-linear-probing-and-external-chaining">24.4
+Handling Collisions: Linear Probing and External Chaining</h1>
+<p>In hashing, a collision occurs when we have multiple elements that
+have the same index in our array.</p>
+<p>There are two common methods to deal with collisions in hash
+tables:</p>
+<ol type="1">
+<li><strong>Linear Probing:</strong> Store the colliding keys elsewhere
+in the array, potentially in the next open array space. This method can
+be seen with distributed hash tables, which you will see in later
+computer science courses that you may take.</li>
+<li><strong>External Chaining:</strong> A simpler solution is to store
+all the keys with the same hash value together in a collection of their
+own, such as a <code>LinkedList</code>. This collection of entries
+sharing a single index is called a <strong>bucket</strong>.</li>
+</ol>
+<h1 id="resizing-hash-table-performance">24.5 Resizing &amp; Hash Table
+Performance</h1>
+<p>No matter how good our <code>hashCode()</code> method is, if the
+underlying array of our hash table is small and we add a lot of keys to
+it, then we will start getting more and more collisions. Because of
+this, a hash table should expand its underlying array once it starts to
+fill up (much like how an <code>ArrayList</code> expands once it fills
+up).</p>
+<p>To keep track of how full our hash table is, we define the term
+<strong>load factor</strong>, which is the ratio of the number of
+elements inserted over the total physical length of the array.</p>
+<figure>
+<img src="../.gitbook/assets/image (55).png" alt="A picture of an equation which states that the load factor is equal to the number of elements divided by the total capacity of the array.">
+<figcaption>
+<p>
+A very important equation
+</p>
+</figcaption>
+</figure>
+<p>For our hash table, we will define the maximum load factor that we
+will allow. <strong>If adding another key-value pair would cause the
+load factor to exceed the specified maximum load factor, then the hash
+table should resize.</strong> This is usually done by doubling the
+underlying array length. Java’s default maximum load factor is 0.75
+which provides a good balance between a reasonably-sized array and
+reducing collisions.</p>
+<p>Note that if we are trying to add a key-value pair and the key
+already exists in the hash map, the corresponding value should be
+updated but no resizing should occur.</p>
+<p>As an example, let’s consider what happens if our hash table has an
+array length of 10 and currently contains 7 elements. Each of these 7
+elements are hashed modulo 10 because we want to get an index within the
+range of 0 through 9. The current load factor is 7/10, or 0.7, just
+under the threshold.</p>
+<p>If we try to insert one more element, we would have a total of 8
+elements in our hash table and a load factor of 0.8. Because this would
+cause the load factor to exceed the maximum load factor, we must resize
+the underlying array to length 20 before we insert the element. Remember
+that since our procedure for locating an entry in the hash table is to
+take the <code>hashCode() % array.length</code> and our array’s length
+has changed from 10 to 20, all the elements in the hash table need to be
+relocated. Once all the elements have been relocated and our new element
+has been added, we will have a load factor of 8/20, or 0.4, which is
+below the maximum load factor.</p>
+<h1 id="summary">24.6 Summary</h1>
+<p>In this chapter, we learned about hashing, a powerful technique for
+turning a more complex object like a <code>String</code> into a
+numerically representable value like an <code>int</code>. </p>
+<p>The <em>hash table</em> is a data structure that combines the
+<em>hash function</em> with the fact that arrays can be indexed in
+constant time. Using the hash table and the map abstract data type, we
+can build a <code>HashMap</code> which allows for amortized constant
+time access to any key-value pair so long as we know which bucket the
+key falls into.</p>
+<p>However, we quickly demonstrated that this naive implementation has
+several drawbacks: the ability to represent all different kinds of
+objects, memory efficiency, and collisions. </p>
+<p>We investigated the importance of the <code>hashCode()</code>
+function to gain an understanding of how it affects the runtime of the
+hash table. To allow for smaller <code>size()</code> in the array, we
+used the modulo operator to shrink hash values down to a specified range
+of numbers. We then added external chaining to solve collisions by
+allowing multiple entries to live in a single bucket in the form of a
+LinkedList, and explored resizing functionality based on the load
+factor!</p>
+<h1 id="exercises">24.7 Exercises</h1>
+<h2 id="potpourri">1. Potpourri</h2>
+<ol type="a">
+<li>True or False: Resizes are triggered if adding a key-value pair
+causes the load factor to be greater than or equal to the specified
+maximum load factor.</li>
+</ol>
+<details>
+<summary>
+Answer to Q1(a)
+</summary>
+<p><strong>False</strong>. A resize will be triggered if adding another
+key value pair would cause the load factor to <strong>exceed</strong>
+the specified maximum load factor. A resize is not triggered when the
+load factor is equal to the specified maximum load factor.</p>
+</details>
+<ol start="2" type="a">
+<li>True or False: The <code>hashCode()</code> function can have varied
+return types.</li>
+</ol>
+<details>
+<summary>
+Answer to Q1(b)
+</summary>
+<p><strong>False</strong>. In Java, the hashCode() function can
+<strong>only</strong> have an <code>int</code> return type to serve as a
+hash value.</p>
+</details>
+<h2 id="hashcode.">2. hashCode()….</h2>
+<p>In order for a hash code to be valid, objects that are equivalent to
+each other (i.e. .equals() returns true) must return equivalent hash
+codes. If an object does not explicitly override the
+<code>hashCode()</code> method, it will inherit the
+<code>hashCode()</code> method defined in the Object class, which
+returns the object’s address in memory.</p>
+<p>Here are four potential implementations of Integer’s
+<code>hashCode()</code> function. Assume that <code>intValue()</code>
+returns the value represented by the Integer object. </p>
+<p>Categorize each <code>hashCode()</code> implementation as either a
+valid or an invalid hash function. If it is valid, point out a flaw or
+disadvantage. If it is invalid, explain why. </p>
+<p>Question (a)</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<details>
+<summary>
+Answer for Q2(a)
+</summary>
+<p>Valid. As required, this hash function returns the same hash code for
+Integers that are .equals() to each other. However, this is a terrible
+hash code because collisions are extremely frequent and occur 100% of
+the time.</p>
+</details>
+<p>Question (b)</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">intValue</span><span class="op">()</span> <span class="op">*</span> <span class="fu">intValue</span><span class="op">();</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<details>
+<summary>
+Answer for Q2(b)
+</summary>
+<p>Valid. Similar to (a), this hash function returns the same hash code
+for Integers that are .equals(). However, Integers that share the same
+absolute values will collide (for example, x = 5 and x = -5 will both
+return the same hashcode). A better hash function would be to just
+return intValue() itself.</p>
+</details>
+<p>Question (c)</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Random</span> rand <span class="op">=</span> <span class="kw">new</span> <span class="bu">Random</span><span class="op">();</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rand<span class="op">.</span><span class="fu">nextInt</span><span class="op">();</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<details>
+<summary>
+Answer for Q2(c)
+</summary>
+<p>Invalid. If we call hashCode() multiple times on the same Integer
+object, we will get different hash codes returned each time.</p>
+</details>
+<p>Question (d)</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">super</span><span class="op">.</span><span class="fu">hashCode</span><span class="op">();</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<details>
+<summary>
+Answer for Q2(d)
+</summary>
+<p>Invalid. This hash function returns some integer corresponding to the
+Integer object’s location in memory. Different Integer objects will
+exist in different locations in memory, so even if they represent the
+same value they will return different hash codes.</p>
+</details>
+<h2 id="hashin-and-resizin">3. Hashin’ and Resizin’</h2>
+<p>Given the provided <code>hashCode()</code> implementation, hash the
+items listed below with external chaining (the first item is already
+inserted for you). Assume the load factor is 1, and the initial
+underlying array has size of 4. Use geometric resizing with a resize
+factor of 2. You may draw more boxes to extend the array when you need
+to resize.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span> Returns <span class="co">0</span> if word begins with <span class="co">’</span>a<span class="co">’,</span> <span class="co">1</span> if it begins with <span class="co">’</span>b<span class="co">’,</span> etc<span class="co">. */</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">int</span> <span class="fu">hashCode</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> word<span class="op">.</span><span class="fu">charAt</span><span class="op">(</span><span class="dv">0</span><span class="op">)</span> <span class="op">-</span> <span class="ch">&#39;a&#39;</span><span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre><code>[&quot;apple&quot;, &quot;cherry&quot;, &quot;fig&quot;, &quot;guava&quot;, &quot;durian&quot;, &quot;apricot&quot;, &quot;banana&quot;]</code></pre>
+<details>
+<summary>
+Answer for Question 3
+</summary>
+<p>Here is what the hash table should look like after inserting
+<code>guava</code>:</p>
+<p><img
+src="../.gitbook/assets/screenshot%202023-03-01%20at%206.05.07%20PM.png" /></p>
+<p>Here is what the hash table should look like after inserting
+<code>durian</code>:</p>
+<p><img src="../.gitbook/assets/image%20(142).png" /></p>
+<p>Here is what the hash table should look like after all insertions
+have been completed:</p>
+<p><img
+src="../.gitbook/assets/screenshot%202023-03-01%20at%206.06.50%20PM.png" /></p>
+</details>
+<h1 id="hashing-i">24. Hashing I</h1>

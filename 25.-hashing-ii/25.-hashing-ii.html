@@ -1,0 +1,299 @@
+<h1 id="hash-table-recap-default-hash-function">25.1 Hash Table Recap,
+Default Hash Function</h1>
+<p>Let’s continue understanding Hashing. We’ve now seen implementations
+for sets and maps.</p>
+<ol type="1">
+<li><p>Red-Black Based Tree Approach: TreeSet/TreeMap</p>
+<p>• requires the items to be comparable (the notion of less or greater
+than)</p>
+<p>• logarithmic time complexity</p></li>
+<li><p>HashTable based approach: HashSet/HashMap</p>
+<p>• constant time operations if the hashCode spreads the item nicely
+(few collisions)</p></li>
+</ol>
+<p>Recall that with a hash table, the idea is that for any piece of
+data, like a String (or any other type of object) we want to store in
+our hash table, we need to turn this into a number called a hash code.
+So a string like “Mihir” can be converted to -2101281024. </p>
+<p>{% hint style=“info” %} Fun Fact: And that integer is anything
+between about negative two billion and about two billion, the space of
+all Java Integers. This range yields about 4 billion integers or 2^32
+integers. If you are interested in why this is the case, please take CS
+61C! {% endhint %}</p>
+<p>Once we have our number, we want to convert this number to our bucket
+number (i.e. which of the many linked lists I want to add this new entry
+to). In the first example, we will use
+the<code>Math.floorMod(x, 4)</code>, since the length of the underlying
+buckets array has length 4.</p>
+<p>If we take the converted hash code for “Mihir”, -2101281024, and then
+mod this by 4, we get 0. This reduces our hash code, -2101281024 to a
+valid index, 0. This means that we would use the 0th bucket to place our
+data, “Mihir”, in our LinkedList at the 0th bucket.</p>
+<blockquote>
+<p>You can essentially think of Java HashTables as just an array of
+LinkedLists categorized under bucket labels and hopefully have better
+performance by utilizing these LinkedLists. </p>
+</blockquote>
+<p>But how many LinkedLists/Buckets should we use? This is an important
+question, because as we insert more and more items into our buckets, the
+length of the LinkedLists will inevitably grow, which in turn
+compromises the runtime for the hash table’s operations. </p>
+<p>For example, let’s say we inserted strings like “Mihir”,
+“Mirchandani”, “loves”, and “61B”, all of which yielded hash codes that
+were divisible by 4. In this case, all strings would be put into the 0th
+index bucket and all strings would be inserted into the same LinkedList.
+What happens to the runtime for a search operation? Well, we would have
+to search through an entire LinkedList to look up our data! This runs in
+linear time and is too slow for HashMap’s famous title of holding fast
+lookup times.</p>
+<p>Last time, we saw that we can have a variable number of LinkedLists.
+The idea is that we resize that array of linked lists whenever the load
+factor (N/M, where N is the number of elements in our table and M is the
+number of buckets) exceeds some constant. Java picks 0.75 as we’ll see
+later. This prevents collisions from happening too frequently. So long
+as our items are spread out nicely, between the buckets, the LinkedLists
+at each bucket for the most part have a very small size, which means
+we’ll on average get constant run time! </p>
+<p>Example: If the HashTable has load factor 3, and our
+<code>hashCode()</code> function spreads out the entries evenly, we are
+going to end up with just 3 items per bucket, and our search operation
+takes <span class="math display"><em>Θ</em>(1)</span>time. </p>
+<h3 id="comparing-data-structure-run-times">Comparing Data Structure Run
+Times! </h3>
+<table>
+<colgroup>
+<col style="width: 70%" />
+<col style="width: 17%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>contains(x)</th>
+<th>add(x)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bushy BSTs</td>
+<td>Θ(log N)</td>
+<td>Θ(log N)</td>
+</tr>
+<tr>
+<td>Separate Chaining Hash Table with NO resizing</td>
+<td>Θ(N)</td>
+<td>Θ(N)</td>
+</tr>
+<tr>
+<td>Separate Chaining Hash Table with resizing</td>
+<td>Θ(1)</td>
+<td>Θ(1)</td>
+</tr>
+</tbody>
+</table>
+<h1 id="distribution-by-other-hash-functions">25.2 Distribution By Other
+Hash Functions</h1>
+<p>Suppose our <code>hashCode()</code> implementation simply returns
+0.</p>
+<pre><code>@Override
+public int hashCode() {
+    return 0;
+}</code></pre>
+<details>
+<summary>
+What distribution do we expect?
+</summary>
+<p>We would expect all of the items in our Hash Table to be in bucket 0.
+As we discussed in the <a
+href="20.1-hash-table-recap-default-hash-function.md">previous
+section</a>, our Hash Table would place all elements in the 0th bucket
+because the hashCode tells it to. In the 0th bucket, there will be a
+LinkedList of all elements from the data yielding a very inefficient
+linear lookup time compared to the constant time we are expecting. No
+matter what key we provide, our hashCode always tells the HashMap to
+only add to the 0th bucket which is why we get this long LinkedList. So
+what do we do to make sure we get constant lookup time? We use a better
+hash function!</p>
+</details>
+<p>In order to get a more even distribution, what we can do is something
+to what we tried in the <a
+href="20.1-hash-table-recap-default-hash-function.md">previous
+section</a> where we utilize modulo. Let’s say that we define the size
+of our Hash Table to have 4 buckets. This means it has 4 corresponding
+LinkedLists and 4 bucket indices labeled {0, 1, 2, 3}. The modding is
+not required in our <code>hashCode()</code> function as it is being done
+for us in the hash table to guarantee we can add to that bucket. As we
+said the hash code could really be any integer in the range of 4 billion
+unique values!</p>
+<p>By using modulo, we ensure that our hashcode yields a number that can
+be represented as an index and clearly identifies which LinkedList to
+add to. Additionally, when adding a series of numbers at once, we see
+that we get an even distribution of numbers in our LinkedList yielding a
+constant lookup time.</p>
+<pre><code>@Override
+public int hashCode() {
+    return num;
+}</code></pre>
+<p>This hash function should yield a much more even distribution!
+Objects with different <code>num</code> will now be more spread out
+across the buckets instead of all living in the 0th bucket. If our class
+does not explicitly override the <code>hashCode()</code> function, Java
+will use the default implementation, which returns the object’s address
+in memory as its hash code!</p>
+<h2 id="why-bother-with-custom-hash-functions">Why Bother With Custom
+Hash Functions?</h2>
+<p>{% embed url=“https://youtu.be/4_gRlDS9AMQ” %}</p>
+<p>Let’s discuss if the default hashCode function is a good hashCode
+function! It actually is a good spread as it relies on the fact that
+different objects will live in different places in the memory, and the
+memory address is effectively random. We will get a good distribution,
+since objects are basically assigned random indices to insert into the
+hash table.</p>
+<p>This really raises an interesting question: why do we care about
+other custom hash functions when the default hashcode gets good spread?
+We’ll read about this in the <a
+href="20.3-contains-and-duplicate-items.md">next section.</a> </p>
+<h1 id="contains-duplicate-items">25.3 Contains &amp; Duplicate
+Items</h1>
+<h2 id="contains">Contains</h2>
+<h3 id="the-equals-method-for-a-colorednumber-object">The
+<code>equals()</code> Method for a ColoredNumber Object</h3>
+<p>Suppose the <code>equals()</code> method for ColoredNumber is as
+below, i.e. two ColoredNumbers are equal if they have the same num.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="at">@Override</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> o<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> <span class="op">(</span>o <span class="kw">instanceof</span> ColoredNumber otherCn<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>       <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">num</span> <span class="op">==</span> otherCn<span class="op">.</span><span class="fu">num</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="hashset-behavior-for-checking-contains">HashSet Behavior for
+Checking <code>contains()</code></h3>
+<p>Suppose the <code>equals()</code> method for ColoredNumber is on the
+previous slide, i.e. two ColoredNumbers are equal if they have the same
+num. </p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> N <span class="op">=</span> <span class="dv">20</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">HashSet</span><span class="op">&lt;</span>ColoredNumber<span class="op">&gt;</span> hs <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    hs<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="kw">new</span> <span class="fu">ColoredNumber</span><span class="op">(</span>i<span class="op">));</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Suppose we now check whether 12 is in the hash table.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ColoredNumber twelve <span class="op">=</span> <span class="kw">new</span> <span class="fu">ColoredNumber</span><span class="op">(</span><span class="dv">12</span><span class="op">);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hs<span class="op">.</span><span class="fu">contains</span><span class="op">(</span>twelve<span class="op">);</span> <span class="co">//returns true</span></span></code></pre></div>
+<p>{% hint style=“info” %} What do we <strong>expect</strong> to be
+returned by <code>contains</code>? {% endhint %}</p>
+<details>
+<summary>
+Answer
+</summary>
+<p>We expect the <code>contains</code> call to be true, all
+<code>12</code>s are created equal!</p>
+</details>
+<h3 id="finding-an-item-using-the-default-hashcode">Finding an Item
+Using the Default Hashcode</h3>
+<p>Suppose we are using the default hash function (uses memory
+address):</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> N <span class="op">=</span> <span class="dv">20</span><span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">HashSet</span><span class="op">&lt;</span>ColoredNumber<span class="op">&gt;</span> hs <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>   hs<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="kw">new</span> <span class="fu">ColoredNumber</span><span class="op">(</span>i<span class="op">));</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ColoredNumber twelve <span class="op">=</span> <span class="kw">new</span> <span class="fu">ColoredNumber</span><span class="op">(</span><span class="dv">12</span><span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>hs<span class="op">.</span><span class="fu">contains</span><span class="op">(</span>twelve<span class="op">);</span> <span class="co">// returns ??</span></span></code></pre></div>
+<p>which yields the table below:</p>
+<p><img
+src="https://lh4.googleusercontent.com/cFvLVhOYg31lSg1a8moftrr30qpThw3Bc7drJWVLNrSTCgTdO4yxjis1epmRlRMLWIkh73alL6OrblQxqGGrjMo1XMoOfPjSFH3tPDDbaxSbLXe1-HXJcfQOglsU4Dp74PiDDqMWXNOmYeQu_D7-l_B2SBcdTVohYMYLZdnzzMVn8_hAbvSKDAKyC-_ev3nN=s2048" /></p>
+<p>Suppose equals returns true if two ColoredNumbers have the same num
+(as we’ve defined previously).</p>
+<p>{% hint style=“info” %} What is actually returned by
+<code>contains</code>? {% endhint %}</p>
+<details>
+<summary>
+Answer
+</summary>
+<p>Returns false with probability 5/6ths.</p>
+<p>Default <code>hashCode()</code> is based on memory address. equals is
+based on <code>num</code>.</p>
+<p>There are two ColoredNumber objects with <code>num = 12</code>. One
+of them is in the HashSet and one of them was created by the code
+above.</p>
+<p>Each memory address is random, with only a 1/6th chance they modulo
+to the same bucket.</p>
+<p>Example: If the <code>ColoredNumber</code> object <code>twelve</code>
+created by the code above is in memory location 6000000, its hashCode %
+6 is 0. HashSet looks in bucket zero, and doesn’t find 12.</p>
+</details>
+<p>{% hint style=“info” %} Hard Question: If the default hash code
+achieves a good spread, why do we even bother to create custom hash
+functions? {% endhint %}</p>
+<details>
+<summary>
+Answer
+</summary>
+<p>It is necessary to have consistency between <code>equals()</code> and
+<code>hashCode()</code> for the hash table’s operations to function.</p>
+</details>
+<p><strong>Basic rule (also definition of deterministic property of a
+valid hashcode):</strong> If two objects are equal, they
+<strong>must</strong> have the same hash code so the hash table can find
+it.</p>
+<h2 id="duplicate-values">Duplicate Values</h2>
+<p>{% embed
+url=“https://www.youtube.com/watch?index=5&amp;list=PL8FaHk7qbOD637Q-6p7nn5dKz1tK6WAjJ&amp;v=3HmCkRYsAGg”
+%}</p>
+<h3 id="overriding-equals-but-not-hashcode">Overriding
+<code>equals()</code> but Not <code>hashCode()</code></h3>
+<p>Suppose we have the same <code>equals()</code> method (comparing
+<code>num</code>), but we do not override <code>hashCode()</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> o<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">...</span>  <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="fu">num</span> <span class="op">==</span> otherCn<span class="op">.</span><span class="fu">num</span><span class="op">;</span> <span class="kw">...</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The result of adding 0 through 19 is shown below:</p>
+<p><img src="../.gitbook/assets/image%20(10).png" /></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ColoredNumber zero <span class="op">=</span> <span class="kw">new</span> <span class="fu">ColoredNumber</span><span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>hs<span class="op">.</span><span class="fu">add</span><span class="op">(</span>zero<span class="op">);</span> <span class="co">// does another zero appear?</span></span></code></pre></div>
+<p>{% hint style=“info” %} Which can happen when we call add(zero)?</p>
+<p>Answer Choices:</p>
+<ol type="1">
+<li>We get a 0 to bin zero.</li>
+<li>We add another 0 to bin one.</li>
+<li>We add a 0 to some other bin.</li>
+<li>We do not get a duplicate zero {% endhint %}</li>
+</ol>
+<details>
+<summary>
+Answer
+</summary>
+<p>3 Choices are Correct: </p>
+<p>#1, #3, #4.</p>
+<p>We get a 0 to bin zero, We add a 0 to some other bin, and we do not
+get a duplicate zero.</p>
+<p>The new zero ends up in a random bin.</p>
+<ul>
+<li>5/6ths chance: In bin 0, 2, 3, 4, or 5. Duplicate!</li>
+<li>1/6 chance: In bin 1, no duplicate! (<code>equals()</code> blocks
+it)</li>
+</ul>
+</details>
+<h2 id="key-takeaway-equals-and-hashcode">Key Takeaway:
+<code>equals()</code> and <code>hashCode()</code></h2>
+<p>Bottom line: If your class override equals, you should also override
+hashCode in a consistent manner.</p>
+<ul>
+<li>If two objects are equal, they must always have the same hash
+code.<br />
+</li>
+</ul>
+<p>If you don’t, everything breaks:</p>
+<ul>
+<li><code>Contains</code> can’t find objects (unless it gets
+lucky).</li>
+<li><code>Add</code> results in duplicates.</li>
+</ul>
+<h1 id="hashing-ii">25. Hashing II</h1>
