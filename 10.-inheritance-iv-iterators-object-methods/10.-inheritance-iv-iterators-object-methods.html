@@ -1,0 +1,1288 @@
+<h1 id="lists-and-sets-in-java">10.1 Lists and Sets in Java</h1>
+<p>In this section, we will learn about how to use Java’s built-in
+<code>List</code> and <code>Set</code> data structures as well as build
+our own <code>ArraySet</code>.</p>
+<h3 id="getting-started">Getting Started</h3>
+<p>{% embed url=“https://youtu.be/DWr8YNXPH6k” %}</p>
+<p>In this course, we’ve already built two kinds of lists:
+<code>AList</code> and <code>SLList</code>. We also built an interface
+<code>List61B</code> to enforce specific list methods <code>AList</code>
+and <code>SLList</code> had to implement. You can find the code at the
+following links:</p>
+<ul>
+<li><a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec9_inheritance2/List61B.java"><code>List61B</code></a></li>
+<li><a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec8_inheritance1/AList.java"><code>AList</code></a></li>
+<li><a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec9_inheritance2/SLList.java"><code>SLList</code></a></li>
+</ul>
+<p>This is how we might use <code>List61B</code> type:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>List61B<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> L <span class="op">=</span> <span class="kw">new</span> AList<span class="op">&lt;&gt;();</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>L<span class="op">.</span><span class="fu">addLast</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>L<span class="op">.</span><span class="fu">addLast</span><span class="op">(</span><span class="dv">10</span><span class="op">);</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>L<span class="op">.</span><span class="fu">addLast</span><span class="op">(</span><span class="dv">15</span><span class="op">);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>L<span class="op">.</span><span class="fu">print</span><span class="op">();</span></span></code></pre></div>
+<h3 id="lists-in-real-java-code">Lists in Real Java Code</h3>
+<p>We built a list from scratch, but Java provides a built-in
+<code>List</code> interface and several implementations,
+e.g. <code>ArrayList</code>. Remember, since <code>List</code> is an
+interface we can’t instantiate it! We must instantiate one of its
+implementations.</p>
+<p>To access this, we can use the full name (‘canonical name’) of
+classes/interfaces:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>java<span class="op">.</span><span class="fu">util</span><span class="op">.</span><span class="fu">List</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> L <span class="op">=</span> <span class="kw">new</span> java<span class="op">.</span><span class="fu">util</span><span class="op">.</span><span class="fu">ArrayList</span><span class="op">&lt;&gt;();</span></span></code></pre></div>
+<p>However, this is a bit verbose. Instead, we can import java
+libraries:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">List</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">ArrayList</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Example <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">List</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> L <span class="op">=</span> <span class="kw">new</span> <span class="bu">ArrayList</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        L<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        L<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">10</span><span class="op">);</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>L<span class="op">);</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="sets">Sets</h3>
+<p>Sets are a collection of unique elements - you can only have one copy
+of each element. Unlike Lists, there is also no sense of order: you
+can’t index into a set, nor can you control where each element is
+inserted into the set.</p>
+<h4 id="java-sets">Java Sets</h4>
+<p>Java has the <code>Set</code> interface along with implementations,
+e.g. <code>HashSet</code>. Remember to import them if you don’t want to
+use the full name!</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">Set</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">HashSet</span><span class="op">;</span></span></code></pre></div>
+<p>Example use:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Set</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> s <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>s<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="st">&quot;Tokyo&quot;</span><span class="op">);</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>s<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="st">&quot;Lagos&quot;</span><span class="op">);</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>s<span class="op">.</span><span class="fu">contains</span><span class="op">(</span><span class="st">&quot;Tokyo&quot;</span><span class="op">));</span> <span class="co">// true</span></span></code></pre></div>
+<h4 id="python-equivalent">Python Equivalent</h4>
+<p>In python, we simply call <code>set()</code>. To check for
+<code>contains</code> we don’t use a method but the keyword
+<code>in</code>. Here’s an example:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>s.add(<span class="st">&quot;Tokyo&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>s.add(<span class="st">&quot;Lagos&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Tokyo&quot;</span> <span class="kw">in</span> s) <span class="op">//</span> <span class="va">True</span></span></code></pre></div>
+<h3 id="diy-arrayset">DIY: ArraySet</h3>
+<p>Our goal is to make our own set, <code>ArraySet</code>, with the
+following methods:</p>
+<ul>
+<li><code>add(value)</code>: add the value to the set if not already
+present</li>
+<li><code>contains(value)</code>: check to see if ArraySet contains the
+key</li>
+<li><code>size()</code>: return number of values</li>
+</ul>
+<p>If you would like to try it yourself, find ‘Do It Yourself’
+<code>ArraySet starter code</code> <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec11_inheritance4/DIY/ArraySet.java">here</a>.
+In the lecture clip below, Professor Hug goes develops the solution:</p>
+<p>{% embed url=“https://youtu.be/gX9KFdZBg-k” %}</p>
+<h1 id="exceptions">10.2 Exceptions</h1>
+<p>In this section, we will learn how to throw exceptions to effectively
+handle errors that may arise in our code.</p>
+<p>{% embed url=“https://youtu.be/r5hp67RfWaY” %}</p>
+<p>Our <code>ArraySet</code> implementation from the previous section
+has a small error. When we add <code>null</code> to our ArraySet, we get
+a NullPointerException.</p>
+<p>The probelm lies in the <code>contains</code> method where we check
+<code>items[i].equals(x)</code>. If the value at <code>items[i]</code>
+is null, then we are calling <code>null.equals(x)</code> -&gt;
+NullPointerException.</p>
+<p>Exceptions cause normal flow of control to stop. We can in fact
+choose to throw our own exceptions. In python you may have seen this
+with the <code>raise</code> keyword. In Java, Exceptions are objects and
+we throw exceptions using the following format:</p>
+<p><code>throw new ExceptionObject(parameter1, ...)</code></p>
+<p><br />
+Let’s throw an exception when a user tries to add null to our
+<code>ArraySet</code>. We’ll throw an
+<code>IllegalArgumentException</code> which takes in one parameter (a
+<code>String</code> message).</p>
+<p>Our updated <code>add</code> method:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* Associates the specified value with the specified key in this map.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">   Throws an IllegalArgumentException if the key is null. */</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">void</span> <span class="fu">add</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">IllegalArgumentException</span><span class="op">(</span><span class="st">&quot;can&#39;t add null&quot;</span><span class="op">);</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="fu">contains</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    items<span class="op">[</span>size<span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    size <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>We get an Exception either way - why does this better?</p>
+<ol type="1">
+<li>We have control of our code: we consciously decide at what point to
+stop the flow of our program</li>
+<li>More useful Exception type and helpful error message for those using
+our code</li>
+</ol>
+<p>However, it would be better if the program doesn’t crash at all.
+There are different things we could do in this case. Here are some
+below:</p>
+<p><strong>Approach 1</strong>: Don’t add <code>null</code> to the array
+if it is passed into <code>add</code> </p>
+<p><strong>Approach 2</strong>: Change the <code>contains</code> method
+to account for the case if <code>items[i] == null</code>.</p>
+<p>Whatever you decide, it is important that users know what to expect.
+That is why documentation (such as comments about your methods) is very
+important.<br />
+</p>
+<h1 id="iteration">10.3 Iteration</h1>
+<p>{% embed url=“https://www.youtube.com/watch?v=Gv6LjusNBU0” %}</p>
+<p>We can use a clean enhanced for loop with Java’s
+<code>HashSet</code></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Set</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> s <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>s<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="st">&quot;Tokyo&quot;</span><span class="op">);</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>s<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="st">&quot;Lagos&quot;</span><span class="op">);</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="bu">String</span> city <span class="op">:</span> s<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>city<span class="op">);</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>However, if we try to do the same with our <code>ArraySet</code>, we
+get an error. How can we enable this functionality?</p>
+<h2 id="enhanced-for-loop">Enhanced For Loop
+<a href="#enhanced-for-loop" id="enhanced-for-loop"></a></h2>
+<p>Let’s first understand what is happening when we use an enhanced for
+loop. We can “translate” an enhanced for loop into an ugly, manual
+approach.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Set</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> s <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">...</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="bu">String</span> city <span class="op">:</span> s<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">...</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The above code translates to:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Set</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> s <span class="op">=</span> <span class="kw">new</span> <span class="bu">HashSet</span><span class="op">&lt;&gt;();</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">...</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Iterator</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;</span> seer <span class="op">=</span> s<span class="op">.</span><span class="fu">iterator</span><span class="op">();</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span>seer<span class="op">.</span><span class="fu">hasNext</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span> city <span class="op">=</span> seer<span class="op">.</span><span class="fu">next</span><span class="op">();</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">...</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Let’s strip away the magic so we can build our own classes that
+support this.</p>
+<p>The key here is an object called an <em>iterator</em>.</p>
+<p>For our example, in List.java we might define an
+<code>iterator()</code> method that returns an iterator object.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">Iterator</span><span class="op">&lt;</span>E<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">();</span></span></code></pre></div>
+<p>Now, we can use that object to loop through all the entries in our
+list:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">List</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> friends <span class="op">=</span> <span class="kw">new</span> <span class="bu">ArrayList</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;();</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">...</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Iterator</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> seer <span class="op">=</span> friends<span class="op">.</span><span class="fu">iterator</span><span class="op">();</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span>seer<span class="op">.</span><span class="fu">hasNext</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>seer<span class="op">.</span><span class="fu">next</span><span class="op">());</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This code behaves identically to the foreach loop version above.</p>
+<p>There are three key methods in our iterator approach:</p>
+<p>First, we get a new iterator object with
+<code>Iterator&lt;Integer&gt; seer = friends.iterator();</code></p>
+<p>Next, we loop through the list with our while loop. We check that
+there are still items left with <code>seer.hasNext()</code>, which will
+return true if there are unseen items remaining, and false if all items
+have been processed.</p>
+<p>Last, <code>seer.next()</code> does two things at once. It returns
+the next element of the list, and here we print it out. It also advances
+the iterator by one item. In this way, the iterator will only inspect
+each item once. </p>
+<h2 id="implementing-iterators">Implementing Iterators
+<a href="#implementing-iterators" id="implementing-iterators"></a></h2>
+<p>In this section, we are going to talk about how to build a class to
+support iteration.</p>
+<p>Let’s start by thinking about what the compiler needs to know in
+order to successfully compile the following iterator example:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">List</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> friends <span class="op">=</span> <span class="kw">new</span> <span class="bu">ArrayList</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;();</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Iterator</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> seer <span class="op">=</span> friends<span class="op">.</span><span class="fu">iterator</span><span class="op">();</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span><span class="op">(</span>seer<span class="op">.</span><span class="fu">hasNext</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>seer<span class="op">.</span><span class="fu">next</span><span class="op">());</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>We can look at the static types of each object that calls a relevant
+method. <code>friends</code> is a List, on which <code>iterator()</code>
+is called, so we must ask:</p>
+<ul>
+<li>Does the List interface have an iterator() method?</li>
+</ul>
+<p><code>seer</code> is an Iterator, on which <code>hasNext()</code> and
+<code>next()</code> are called, so we must ask:</p>
+<ul>
+<li>Does the Iterator interface have next/hasNext() methods?</li>
+</ul>
+<p>So how do we implement these requirements?</p>
+<p>The List interface extends the Iterable interface, inheriting the
+abstract iterator() method. (Actually, List extends Collection which
+extends Iterable, but it’s easier to codethink of this way to
+start.)</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">interface</span> <span class="bu">Iterable</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">();</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">interface</span> <span class="bu">List</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="kw">extends</span> <span class="bu">Iterable</span><span class="op">&lt;</span>T<span class="op">&gt;{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">...</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Next, the compiler checks that Iterators have <code>hasNext()</code>
+and <code>next()</code>. The Iterator interface specifies these abstract
+methods explicitly:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">interface</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">();</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    T <span class="fu">next</span><span class="op">();</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><strong>What if someone calls <code>next</code> when
+<code>hasNext</code> returns false?</strong></p>
+<pre><code>This behavior is undefined. However, a common convention is to throw a `NoSuchElementException`. See [Discussion 5](https://sp19.datastructur.es/materials/discussion/disc05sol.pdf) for examples.</code></pre>
+<p><strong>Will <code>hasNext</code> always be called before
+<code>next</code>?</strong></p>
+<pre><code>Not necessarily. This is sometimes the case when someone using the iterator knows exactly how many elements are in the sequence. Thus, we can&#39;t rely on the user calling `hasNext` before `next`. However, you can always call `hasNext` from within your `next` function.</code></pre>
+<p>Specific classes will implement their own iteration behaviors for the
+interface methods. Let’s look at an example. (Note: if you want to build
+this up from the start, follow along with the live coding in the
+video.)</p>
+<p>We are going to add iteration through keys to our
+<code>ArraySet</code> class. First, we write a new class called
+ArraySetIterator, nested inside of ArraySet:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span> <span class="kw">class</span> ArraySetIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> wizPos<span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySetIterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        wizPos <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> wizPos <span class="op">&lt;</span> size<span class="op">;</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        T returnItem <span class="op">=</span> items<span class="op">[</span>wizPos<span class="op">];</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        wizPos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This ArraySetIterator implements <code>Iterator&lt;T&gt;</code>,
+which means it implements a <code>hasNext()</code> method, and a
+<code>next()</code> method, using a <code>wizPos</code> position as an
+index to keep track of its position in the array. For a different data
+structure, we might implement these two methods differently.</p>
+<p><strong>Thought Exercise:</strong> How would you design
+<code>hasNext()</code> and <code>next()</code> for a linked list?</p>
+<p>Now that we have the appropriate methods, we could use a
+ArraySetIterator to iterate through an <code>ArraySet</code>:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="bu">Iterator</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> iter <span class="op">=</span> aset<span class="op">.</span><span class="fu">iterator</span><span class="op">();</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span><span class="op">(</span>iter<span class="op">.</span><span class="fu">hasNext</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>iter<span class="op">.</span><span class="fu">next</span><span class="op">());</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>We still want to be able to support the enhanced for loop, though, to
+make our calls cleaner. So, we need to make <code>ArraySet</code>
+implement the Iterable interface. The essential method of the Iterable
+interface is <code>iterator()</code>, which returns an Iterator object
+for that class. All we have to do is return an instance of our
+<code>ArraySetIterator</code> that we just wrote!</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">ArraySetIterator</span><span class="op">();</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Now we can use enhanced for loops with our
+<code>ArrraySet</code>!</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">...</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">:</span> aset<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Here we’ve seen <strong>Iterable</strong>, the interface that makes a
+class able to be iterated on, and requires the method
+<code>iterator()</code>, which returns an Iterator object. And we’ve
+seen <strong>Iterator</strong>, the interface that defines the object
+with methods to actually do that iteration. You can think of an Iterator
+as a machine that you put onto an iterable that facilitates the
+iteration. Any iterable is the object on which the iterator is
+performing.</p>
+<p>With these two components, you can make fancy for loops for your
+classes!</p>
+<p><code>ArraySet</code> code with iteration support is below:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">Iterator</span><span class="op">;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> ArraySet<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="kw">implements</span> <span class="bu">Iterable</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> T<span class="op">[]</span> items<span class="op">;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> size<span class="op">;</span> <span class="co">// the next item to be added will be at position size</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySet</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        items <span class="op">=</span> <span class="op">(</span>T<span class="op">[])</span> <span class="kw">new</span> <span class="bu">Object</span><span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        size <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns true if this map contains a mapping for the specified key.</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co">     */</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">contains</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>items<span class="op">[</span>i<span class="op">].</span><span class="fu">equals</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Associates the specified value with the specified key in this map.</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co">       Throws an IllegalArgumentException if the key is null. */</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">add</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">IllegalArgumentException</span><span class="op">(</span><span class="st">&quot;can&#39;t add null&quot;</span><span class="op">);</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="fu">contains</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>        items<span class="op">[</span>size<span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>        size <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns the number of key-value mappings in this map. */</span></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">size</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> size<span class="op">;</span></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> returns an iterator <span class="co">(</span>a<span class="co">.</span>k<span class="co">.</span>a<span class="co">.</span> seer<span class="co">)</span> into ME <span class="co">*/</span></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">new</span> <span class="fu">ArraySetIterator</span><span class="op">();</span></span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="kw">class</span> ArraySetIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>        <span class="kw">private</span> <span class="dt">int</span> wizPos<span class="op">;</span></span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="fu">ArraySetIterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> wizPos <span class="op">&lt;</span> size<span class="op">;</span></span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a>            T returnItem <span class="op">=</span> items<span class="op">[</span>wizPos<span class="op">];</span></span>
+<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a>        <span class="co">//iteration</span></span>
+<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">:</span> aset<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a>            <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="object-methods">12.4 Object Methods</h1>
+<p>All classes inherit from the overarching Object class. The methods
+that are inherited are as follows:</p>
+<ul>
+<li><code>String toString()</code></li>
+<li><code>boolean equals(Object obj)</code></li>
+<li><code>Class &lt;?&gt; getClass()</code></li>
+<li><code>int hashCode()</code></li>
+<li><code>protected Objectclone()</code></li>
+<li><code>protected void finalize()</code></li>
+<li><code>void notify()</code></li>
+<li><code>void notifyAll()</code></li>
+<li><code>void wait()</code></li>
+<li><code>void wait(long timeout)</code></li>
+<li><code>void wait(long timeout, int nanos)</code></li>
+</ul>
+<p>We are going to focus on the first two in this chapter. We will take
+advantage of inheritance to override these two methods in our classes to
+behave in the ways we want them to.</p>
+<h2 id="tostring">toString() <a href="#tostring" id="tostring"></a></h2>
+<p>{% embed url=“https://www.youtube.com/watch?v=AKnMv0ootkg” %}</p>
+<p>The <code>toString()</code> method provides a string representation
+of an object. The <code>System.out.println()</code> function implicitly
+calls this method on whatever object is passed to it and prints the
+string returned. When you run <code>System.out.println(dog)</code>, it’s
+actually doing this:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">String</span> s <span class="op">=</span> dog<span class="op">.</span><span class="fu">toString</span><span class="op">()</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>s<span class="op">)</span></span></code></pre></div>
+<p>The default <code>Object</code> class’ <code>toString()</code> method
+prints the location of the object in memory. This is a hexadecimal
+string. Classes like Arraylist and java arrays have their own overridden
+versions of the <code>toString()</code> method. This is why, when you
+were working with and writing tests for Arraylist, errors would always
+return the list in a nice format like this (1, 2, 3, 4) instead of
+returning the memory location.</p>
+<p>For classes that we’ve written by ourselves like
+<code>ArrayDeque</code>, <code>LinkedListDeque</code>, etc, we need to
+provide our own <code>toString()</code> method if we want to be able to
+see the objects printed in a readable format.</p>
+<p>Let’s try to write this method for an <code>ArraySet</code> class.
+Read the <code>ArraySet</code> class below and make sure you understand
+what the various methods do. Feel free to plug the code into java
+visualizer to get a better understanding!</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">Iterator</span><span class="op">;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> ArraySet<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="kw">implements</span> <span class="bu">Iterable</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> T<span class="op">[]</span> items<span class="op">;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> size<span class="op">;</span> <span class="co">// the next item to be added will be at position size</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySet</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>        items <span class="op">=</span> <span class="op">(</span>T<span class="op">[])</span> <span class="kw">new</span> <span class="bu">Object</span><span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        size <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns true if this map contains a mapping for the specified key.</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">     */</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">contains</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>items<span class="op">[</span>i<span class="op">].</span><span class="fu">equals</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Associates the specified value with the specified key in this map.</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="co">       Throws an IllegalArgumentException if the key is null. */</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">add</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">IllegalArgumentException</span><span class="op">(</span><span class="st">&quot;can&#39;t add null&quot;</span><span class="op">);</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="fu">contains</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>        items<span class="op">[</span>size<span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>        size <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns the number of key-value mappings in this map. */</span></span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">size</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> size<span class="op">;</span></span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> returns an iterator <span class="co">(</span>a<span class="co">.</span>k<span class="co">.</span>a<span class="co">.</span> seer<span class="co">)</span> into ME <span class="co">*/</span></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">new</span> <span class="fu">ArraySetIterator</span><span class="op">();</span></span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="kw">class</span> ArraySetIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>        <span class="kw">private</span> <span class="dt">int</span> wizPos<span class="op">;</span></span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="fu">ArraySetIterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> wizPos <span class="op">&lt;</span> size<span class="op">;</span></span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a>            T returnItem <span class="op">=</span> items<span class="op">[</span>wizPos<span class="op">];</span></span>
+<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb25-61"><a href="#cb25-61" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-62"><a href="#cb25-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-63"><a href="#cb25-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-64"><a href="#cb25-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb25-65"><a href="#cb25-65" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* hmmm */</span></span>
+<span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* hmmm */</span></span>
+<span id="cb25-73"><a href="#cb25-73" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-74"><a href="#cb25-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-75"><a href="#cb25-75" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-76"><a href="#cb25-76" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb25-77"><a href="#cb25-77" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb25-78"><a href="#cb25-78" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb25-79"><a href="#cb25-79" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb25-80"><a href="#cb25-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-81"><a href="#cb25-81" aria-hidden="true" tabindex="-1"></a>        <span class="co">//iteration</span></span>
+<span id="cb25-82"><a href="#cb25-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">:</span> aset<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-83"><a href="#cb25-83" aria-hidden="true" tabindex="-1"></a>            <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb25-84"><a href="#cb25-84" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb25-85"><a href="#cb25-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-86"><a href="#cb25-86" aria-hidden="true" tabindex="-1"></a>        <span class="co">//toString</span></span>
+<span id="cb25-87"><a href="#cb25-87" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">);</span></span>
+<span id="cb25-88"><a href="#cb25-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-89"><a href="#cb25-89" aria-hidden="true" tabindex="-1"></a>        <span class="co">//equals</span></span>
+<span id="cb25-90"><a href="#cb25-90" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset2 <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb25-91"><a href="#cb25-91" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb25-92"><a href="#cb25-92" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb25-93"><a href="#cb25-93" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb25-94"><a href="#cb25-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-95"><a href="#cb25-95" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span>aset2<span class="op">));</span></span>
+<span id="cb25-96"><a href="#cb25-96" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span><span class="kw">null</span><span class="op">));</span></span>
+<span id="cb25-97"><a href="#cb25-97" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span><span class="st">&quot;fish&quot;</span><span class="op">));</span></span>
+<span id="cb25-98"><a href="#cb25-98" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span>aset<span class="op">));</span></span>
+<span id="cb25-99"><a href="#cb25-99" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>You can find the <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec11_inheritance4/ArraySet.java">solutions
+here (ArraySet.java)</a></p>
+<p><strong>Exercise 6.4.1:</strong> Write the toString() method so that
+when we print an ArraySet, it prints the elements separated by commas
+inside of curly braces. i.e {1, 2, 3, 4}. Remember, the toString()
+method should return a string.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span> returnString <span class="op">=</span> <span class="st">&quot;{&quot;</span><span class="op">;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        returnString <span class="op">+=</span> keys<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        returnString <span class="op">+=</span> <span class="st">&quot;, &quot;</span><span class="op">;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    returnString <span class="op">+=</span> <span class="st">&quot;}&quot;</span><span class="op">;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> returnString<span class="op">;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This solution, although seemingly simple and elegant, is actually
+very naive. This is because when you use string concatenation in Java
+like so: <code>returnString += keys[i];</code> you are actually not just
+appending to <code>returnString</code>, you are creating an entirely new
+string. This is incredibly inefficient because creating a new string
+object takes time too! Specifically, linear in the length of the string
+(we’ll discuss why in a later chapter!).</p>
+<p><strong>Bonus Question:</strong> Let’s say concatenating one
+character to a string takes 1 second. If we have an ArraySet of size 5:
+<code>{1, 2, 3, 4, 5}</code>, how long would it take to run the
+<code>toString()</code> method?</p>
+<p><strong>Answer:</strong> We set <code>returnString</code> to the left
+bracket which takes one second because this involves adding
+<code>{</code> to the empty string <code>""</code>. Adding the first
+element will involve creating an entirely new string, adding } and 1
+which would take 2 seconds. Adding the second element takes 3 seconds
+because we need to add <code>{</code>, <code>1</code>, <code>2</code>.
+This process continues, so for the entire array set the total time is
+<code>1 + 2 + 3 + 4 + 5 + 6 + 7.</code></p>
+<p>To remedy this, Java has a special class called
+<code>StringBuilder</code>. It creates a string object that is mutable,
+so you can continue appending to the same string object instead of
+creating a new one each time.</p>
+<p><strong>Exercise 6.4.2:</strong> Rewrite the toString() method using
+StringBuilder.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">StringBuilder</span> returnSB <span class="op">=</span> <span class="kw">new</span> <span class="bu">StringBuilder</span><span class="op">(</span><span class="st">&quot;{&quot;</span><span class="op">);</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>            returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span>items<span class="op">[</span>i<span class="op">].</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>            returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span><span class="st">&quot;, &quot;</span><span class="op">);</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span>items<span class="op">[</span>size <span class="op">-</span> <span class="dv">1</span><span class="op">]);</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>        returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span><span class="st">&quot;}&quot;</span><span class="op">);</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> returnSB<span class="op">.</span><span class="fu">toString</span><span class="op">();</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<p>Now you’ve successfully overridden the <code>toString()</code>
+method! Try printing the ArraySet to see the fruits of your work.</p>
+<p>Next we will override another important object method:
+<code>equals()</code></p>
+<h2 id="equals">equals() <a href="#equals" id="equals"></a></h2>
+<p>{% embed url=“https://www.youtube.com/watch?v=qHuS1o97nfQ” %}</p>
+<p><code>equals()</code> and <code>==</code> have different behaviors in
+Java. <code>==</code> Checks if two objects are actually the same object
+in memory. Remember, pass-by-value! <code>==</code> checks if two boxes
+hold the same thing. For primitives, this means checking if the values
+are equal. For objects, this means checking if the address/pointer is
+equal.</p>
+<p>Say we have this <code>Doge</code> class:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Doge <span class="op">{</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="dt">int</span> age<span class="op">;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="bu">String</span> name<span class="op">;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="fu">Doge</span><span class="op">(</span><span class="dt">int</span> age<span class="op">,</span> <span class="bu">String</span> name<span class="op">){</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">this</span><span class="op">.</span><span class="fu">age</span> <span class="op">=</span> age<span class="op">;</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">this</span><span class="op">.</span><span class="fu">name</span> <span class="op">=</span> name<span class="op">;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> y <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> z <span class="op">=</span> <span class="dv">6</span><span class="op">;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>      Doge fido <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">5</span><span class="op">,</span> <span class="st">&quot;Fido&quot;</span><span class="op">);</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>      Doge doggo <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">6</span><span class="op">,</span> <span class="st">&quot;Doggo&quot;</span><span class="op">);</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>      Doge fidoTwin <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">5</span><span class="op">,</span> <span class="st">&quot;Fido&quot;</span><span class="op">);</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>      Doge fidoRealTwin <span class="op">=</span> fido<span class="op">;</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>If we plug this code into the java visualizer, we will see the box in
+pointer diagram shown below.</p>
+<p><img
+src="https://joshhug.gitbooks.io/hug61b/content/assets/Doge.png" /></p>
+<p><strong>Exercise 6.4.3:</strong> What would java return if we ran the
+following?</p>
+<ul>
+<li><code>x == y</code></li>
+<li><code>x == z</code></li>
+<li><code>fido == doggo</code></li>
+<li><code>fido == fidoTwin</code></li>
+<li><code>fido == fidoRealTwin</code></li>
+</ul>
+<p><strong>Answers</strong></p>
+<ul>
+<li><code>True</code></li>
+<li><code>False</code></li>
+<li><code>False</code></li>
+<li><code>False</code></li>
+<li><code>True</code></li>
+</ul>
+<p><code>fido</code> and <code>fidoTwin</code> are not considered
+<code>==</code> because they point to different objects. However, this
+is quite silly since all their attributes are the same. You can see how
+<code>==</code> can cause some problems in Java testing. When we write
+tests for our ArrayList and want to check if expected is the same as
+what is returned by our function, we create expected as a new arraylist.
+If we used <code>==</code> in our test, it would always return false.
+This is what <code>equals(Object o)</code> is for.</p>
+<h2 id="equalsobject-o"><code>equals(Object o)</code>
+<a href="#equalsobject-o" id="equalsobject-o"></a></h2>
+<p><code>equals(Object o)</code> is a method in the Object class that,
+by default, acts like == in that it checks if the memory address of the
+this is the same as o. However, we can override it to define equality in
+whichever way we wish! For example, for two Arraylists to be considered
+equal, they just need to have the same elements in the same order.</p>
+<p><strong>Exercise 6.4.4:</strong> Let’s write an equals method for the
+ArraySet class. Remember, a set is an unordered collection of unique
+elements. So, for two sets to be considered equal, you just need to
+check if they have the same elements.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span> <span class="op">==</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>other <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>other<span class="op">.</span><span class="fu">getClass</span><span class="op">()</span> <span class="op">!=</span> <span class="kw">this</span><span class="op">.</span><span class="fu">getClass</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span>T<span class="op">&gt;</span> o <span class="op">=</span> <span class="op">(</span>ArraySet<span class="op">&lt;</span>T<span class="op">&gt;)</span> other<span class="op">;</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>o<span class="op">.</span><span class="fu">size</span><span class="op">()</span> <span class="op">!=</span> <span class="kw">this</span><span class="op">.</span><span class="fu">size</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span>T item <span class="op">:</span> <span class="kw">this</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(!</span>o<span class="op">.</span><span class="fu">contains</span><span class="op">(</span>item<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<p>We added a few checks in the beginning of the method to make sure our
+<code>.equals()</code> can handle nulls and objects of a different
+class. We also optimized the function by returning true right away if
+the == methods returns true. This way, we avoid the extra work of
+iterating through the set.</p>
+<p><strong>Rules for Equals in Java:</strong> Overriding a
+<code>.equals()</code> method may sometimes be trickier than it seems. A
+couple of rules to adhere to while implementing your
+<code>.equals()</code> method are as follows:</p>
+<p>1.) <code>equals</code> must be an equivalence relation</p>
+<ul>
+<li><strong>reflexive</strong>: <code>x.equals(x)</code> is true</li>
+<li><strong>symmetric</strong>: <code>x.equals(y)</code> if and only if
+<code>y.equals(x)</code></li>
+<li><strong>transitive</strong>: <code>x.equals(y)</code> and
+<code>y.equals(z)</code> implies <code>x.equals(z)</code></li>
+</ul>
+<p>2.) It must take an Object argument, in order to override the
+original <code>.equals()</code> method</p>
+<p>3.) It must be consistent if <code>x.equals(y)</code>, then as long
+as <code>x</code> and <code>y</code> remain unchanged: <code>x</code>
+must continue to equal <code>y</code></p>
+<p>4.) It is never true for null <code>x.equals(null)</code> must be
+false</p>
+<h2 id="bonus-video">Bonus video
+<a href="#bonus-video" id="bonus-video"></a></h2>
+<p>Create an even better <code>toString</code> method and
+<code>ArraySet.of</code>:</p>
+<p>{% embed url=“https://www.youtube.com/watch?v=tjLpeVD0KWc” %}</p>
+<p>Link to the <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec11_inheritance4/ArraySet.java">bonus
+code</a></p>
+<h1 id="chapter-summary">10.5 Chapter Summary</h1>
+<p>You can find the code from this lecture <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/tree/main/lec12_inheritance4">here</a>.
+</p>
+<h3 id="exceptions-1">Exceptions</h3>
+<p>Most likely you have encountered an exception in your code such as a
+<code>NullPointerException</code> or an
+<code>IndexOutOfBoundsException</code>. Now we will learn about how we
+can “throw” exceptions ourselves. Here is an example of an exception
+that we throw:</p>
+<pre><code>throw new RuntimeException(&quot;For no reason.&quot;);</code></pre>
+<p>This is useful to ensure reasonable functioning of our code, even
+when facing unexpected behavior.</p>
+<h3 id="iteration-1">Iteration</h3>
+<h4 id="difference-between-iterators-and-iterables">Difference between
+Iterators and Iterables</h4>
+<p>These two words are very closely related, but have two different
+meanings that are often easy to confuse. The first thing to know is that
+these are both Java interfaces, with different methods that need to be
+implemented. Here is a simplified interface for Iterator:</p>
+<pre><code>public interface Iterator&lt;T&gt; {
+  boolean hasNext();
+  T next();
+}</code></pre>
+<p>Here is a simplified interface for Iterable:</p>
+<pre><code>public interface Iterable&lt;T&gt; {
+    Iterator&lt;T&gt; iterator();
+}</code></pre>
+<p>Notice that in order for an object (for example an ArrayList or
+LinkedList) to be <em>iterable</em>, it must include a method that
+returns an <em>iterator</em>. The iterator is the object that actively
+steps through an iterable object. Keep this relationship and distinction
+in mind as you work with these two interfaces.</p>
+<h3 id="object-methods-1">Object Methods</h3>
+<h4 id="tostring-1">toString</h4>
+<p>The <code>toString()</code> method returns a string representation of
+objects. For example, <code>System.out.println(someObject)</code> calls
+the <code>toString()</code> method of <code>someObject</code>, and
+prints to console whatever string it returns. </p>
+<p>This is most helpful when we are debugging, as it allows us to much
+more easily understand the current state of our Objects.</p>
+<h4 id="vs-.equals">== vs .equals</h4>
+<p>We have two concepts of equality in Java- “==” and the “.equals()”
+method. The key difference is that when using ==, we are checking if two
+objects have the same address in memory (that they point to the same
+instance or object). On the other hand, .equals() is a method that can
+be overridden by a class and can be used to define some custom way of
+determining equality. This permits the class to utilize the additional
+knowledge it has about itself to more accurately answer questions of
+equality.</p>
+<p>For example, say we wanted to check if two stones are equal:</p>
+<pre><code>public class Stone{
+  int weight;
+  public Stone(int weight){
+    this.weight = weight;
+  }
+}
+Stone s = new Stone(100);
+Stone r = new Stone(100);</code></pre>
+<p>If we want to consider s and r equal because they have the same
+weight. If we do check equality using ==, these Stones would not be
+considered equal because they do not have the same memory address.</p>
+<p>On the other hand, if you override the equals method of Stone as
+follows</p>
+<pre><code>public boolean equals(Object o){
+  return this.weight == ((Stone) o).weight
+}</code></pre>
+<p>We would have that the stones would be considered equal because they
+have the same weight.</p>
+<h1 id="exercises">10.6 Exercises</h1>
+<h3 id="factual">Factual</h3>
+<ol type="1">
+<li>What methods are required for a class that is Iterable?</li>
+<li>Which of the following is true about the <code>java.util.Se</code>t
+and the <code>java.util.List</code> interfaces?
+<ul class="task-list">
+<li><label><input type="checkbox" />If we add <code>String[][]</code>
+objects to a <code>Set</code> and a <code>List</code>, the size of the
+set will always be less than or equal to the size of the
+list.</label></li>
+<li><label><input type="checkbox" />The <code>java.util.ArrayList</code>
+class is an implementation of the <code>java.util.List</code>
+interface.</label></li>
+<li><label><input type="checkbox" />The <code>Set</code> and
+<code>List</code> interfaces extend the <code>Iterator</code>
+interface.</label></li>
+<li><label><input type="checkbox" />The <code>Set</code> and
+<code>List</code> interfaces extend the <code>Iterable</code>
+interface.</label></li>
+</ul></li>
+<li>Suppose we have a class that implements <code>Iterator</code>. What
+methods must it override in order to compile?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>An <code>Iterable</code> is required to have the
+<code>iterator()</code> method, which returns an
+<code>Iterator</code>.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<ul>
+<li><strong>If we add <code>String[][]</code> objects to a
+<code>Set</code> and a <code>List</code>, the size of the set will
+always be less than or equal to the size of the list.</strong> Sets only
+have unique items, while lists can have duplicates, so if we add the
+same elements to both the list will always have at least as many
+elements as the set.</li>
+<li><strong>The <code>java.util.ArrayList</code> class is an
+implementation of the <code>java.util.List</code> interface.</strong>
+One implementation of the <code>List</code> interface in Java is the
+ArrayList class.</li>
+<li><strong>The <code>Set</code> and <code>List</code> interfaces extend
+the <code>Iterable</code> interface.</strong> Sets and Lists in Java can
+be used in enhanced for loops, which means that they are
+<code>Iterable</code>.</li>
+</ul>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>An <code>Iterator</code> must override <code>hasNext()</code>, which
+returns a boolean indicating whether there are more elements in the
+<code>Iterator</code>, and <code>next()</code>, which returns the next
+item.</p>
+</details>
+<h3 id="conceptual">Conceptual</h3>
+<ol type="1">
+<li>Why do we want to override the <code>.equals</code> method?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>The <code>.equals()</code> method inherited from <code>Object</code>
+only checks if two items have the same memory address. This is
+undesireable behavior for many user-written classes in Java.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>In lecture, you built the <code>ArraySetIterator</code> class.
+Modify the lecture class to take in a <code>Comparator&lt;T&gt;</code>
+and an item of generic type <code>T</code> called <code>ref</code> in
+the constructor. This new iterator should only return items greater than
+<code>T</code>. For reference, the code for
+<code>ArraySetIterator</code> is included below.</li>
+</ol>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span> <span class="kw">class</span> ArraySetIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> pos<span class="op">;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySetIterator</span><span class="op">()</span> <span class="op">{</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>        pos <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span> </span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pos <span class="op">&lt;</span> size<span class="op">;</span> </span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        T returnItem <span class="op">=</span> items<span class="op">[</span>pos<span class="op">];</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>        pos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<ol start="2" type="1">
+<li>Problem 7 from the Spring 2018 Midterm 2</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> ArraySetGreaterIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> pos<span class="op">;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> T ref<span class="op">;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="bu">Comparator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> comp<span class="op">;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySetGreaterIterator</span><span class="op">(</span>T ref<span class="op">,</span> <span class="bu">Comparator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> comp<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">ref</span> <span class="op">=</span> ref<span class="op">;</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">comp</span> <span class="op">=</span> comp<span class="op">;</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pos <span class="op">&lt;</span> size<span class="op">;</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>        T returnItem <span class="op">=</span> items<span class="op">[</span>pos<span class="op">];</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="op">(</span>comp<span class="op">.</span><span class="fu">compare</span><span class="op">(</span>returnItem<span class="op">,</span> ref<span class="op">)</span> <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>            pos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>            returnItem <span class="op">=</span> items<span class="op">[</span>pos<span class="op">];</span></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><a
+href="https://drive.google.com/file/d/1LIyFXwHYCWXNqIgKTsTyKiOYnB79_ykk/view">Solutions</a>
+and <a
+href="https://www.youtube.com/watch?v=nMZn4EV0gGw">walkthrough</a> are
+linked here and on the course website.</p>
+</details>
+<h1 id="object-methods-2">10.4 Object Methods</h1>
+<p>All classes inherit from the overarching Object class. The methods
+that are inherited are as follows:</p>
+<ul>
+<li><code>String toString()</code></li>
+<li><code>boolean equals(Object obj)</code></li>
+<li><code>Class &lt;?&gt; getClass()</code></li>
+<li><code>int hashCode()</code></li>
+<li><code>protected Objectclone()</code></li>
+<li><code>protected void finalize()</code></li>
+<li><code>void notify()</code></li>
+<li><code>void notifyAll()</code></li>
+<li><code>void wait()</code></li>
+<li><code>void wait(long timeout)</code></li>
+<li><code>void wait(long timeout, int nanos)</code></li>
+</ul>
+<p>We are going to focus on the first two in this chapter. We will take
+advantage of inheritance to override these two methods in our classes to
+behave in the ways we want them to.</p>
+<h2 id="tostring-2">toString()
+<a href="#tostring" id="tostring"></a></h2>
+<p>{% embed url=“https://www.youtube.com/watch?v=AKnMv0ootkg” %}</p>
+<p>The <code>toString()</code> method provides a string representation
+of an object. The <code>System.out.println()</code> function implicitly
+calls this method on whatever object is passed to it and prints the
+string returned. When you run <code>System.out.println(dog)</code>, it’s
+actually doing this:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="bu">String</span> s <span class="op">=</span> dog<span class="op">.</span><span class="fu">toString</span><span class="op">()</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>s<span class="op">)</span></span></code></pre></div>
+<p>The default <code>Object</code> class’ <code>toString()</code> method
+prints the location of the object in memory. This is a hexadecimal
+string. Classes like Arraylist and java arrays have their own overridden
+versions of the <code>toString()</code> method. This is why, when you
+were working with and writing tests for Arraylist, errors would always
+return the list in a nice format like this (1, 2, 3, 4) instead of
+returning the memory location.</p>
+<p>For classes that we’ve written by ourselves like
+<code>ArrayDeque</code>, <code>LinkedListDeque</code>, etc, we need to
+provide our own <code>toString()</code> method if we want to be able to
+see the objects printed in a readable format.</p>
+<p>Let’s try to write this method for an <code>ArraySet</code> class.
+Read the <code>ArraySet</code> class below and make sure you understand
+what the various methods do. Feel free to plug the code into java
+visualizer to get a better understanding!</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="im">java</span><span class="op">.</span><span class="im">util</span><span class="op">.</span><span class="im">Iterator</span><span class="op">;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> ArraySet<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="kw">implements</span> <span class="bu">Iterable</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> T<span class="op">[]</span> items<span class="op">;</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">int</span> size<span class="op">;</span> <span class="co">// the next item to be added will be at position size</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="fu">ArraySet</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>        items <span class="op">=</span> <span class="op">(</span>T<span class="op">[])</span> <span class="kw">new</span> <span class="bu">Object</span><span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>        size <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns true if this map contains a mapping for the specified key.</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="co">     */</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">contains</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>items<span class="op">[</span>i<span class="op">].</span><span class="fu">equals</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Associates the specified value with the specified key in this map.</span></span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a><span class="co">       Throws an IllegalArgumentException if the key is null. */</span></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">add</span><span class="op">(</span>T x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">IllegalArgumentException</span><span class="op">(</span><span class="st">&quot;can&#39;t add null&quot;</span><span class="op">);</span></span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="fu">contains</span><span class="op">(</span>x<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>        items<span class="op">[</span>size<span class="op">]</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>        size <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* Returns the number of key-value mappings in this map. */</span></span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="fu">size</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> size<span class="op">;</span></span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">/**</span> returns an iterator <span class="co">(</span>a<span class="co">.</span>k<span class="co">.</span>a<span class="co">.</span> seer<span class="co">)</span> into ME <span class="co">*/</span></span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="fu">iterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">new</span> <span class="fu">ArraySetIterator</span><span class="op">();</span></span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="kw">class</span> ArraySetIterator <span class="kw">implements</span> <span class="bu">Iterator</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>        <span class="kw">private</span> <span class="dt">int</span> wizPos<span class="op">;</span></span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="fu">ArraySetIterator</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">hasNext</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> wizPos <span class="op">&lt;</span> size<span class="op">;</span></span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>        <span class="kw">public</span> T <span class="fu">next</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>            T returnItem <span class="op">=</span> items<span class="op">[</span>wizPos<span class="op">];</span></span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>            wizPos <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> returnItem<span class="op">;</span></span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* hmmm */</span></span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a>        <span class="co">/* hmmm */</span></span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>        aset<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>        <span class="co">//iteration</span></span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">:</span> aset<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a>            <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>        <span class="co">//toString</span></span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">);</span></span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-89"><a href="#cb38-89" aria-hidden="true" tabindex="-1"></a>        <span class="co">//equals</span></span>
+<span id="cb38-90"><a href="#cb38-90" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> aset2 <span class="op">=</span> <span class="kw">new</span> ArraySet<span class="op">&lt;&gt;();</span></span>
+<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">23</span><span class="op">);</span></span>
+<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a>        aset2<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span>aset2<span class="op">));</span></span>
+<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span><span class="kw">null</span><span class="op">));</span></span>
+<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span><span class="st">&quot;fish&quot;</span><span class="op">));</span></span>
+<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span>aset<span class="op">.</span><span class="fu">equals</span><span class="op">(</span>aset<span class="op">));</span></span>
+<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>You can find the <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec11_inheritance4/ArraySet.java">solutions
+here (ArraySet.java)</a></p>
+<p><strong>Exercise 6.4.1:</strong> Write the toString() method so that
+when we print an ArraySet, it prints the elements separated by commas
+inside of curly braces. i.e {1, 2, 3, 4}. Remember, the toString()
+method should return a string.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">String</span> returnString <span class="op">=</span> <span class="st">&quot;{&quot;</span><span class="op">;</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        returnString <span class="op">+=</span> keys<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        returnString <span class="op">+=</span> <span class="st">&quot;, &quot;</span><span class="op">;</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    returnString <span class="op">+=</span> <span class="st">&quot;}&quot;</span><span class="op">;</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> returnString<span class="op">;</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This solution, although seemingly simple and elegant, is actually
+very naive. This is because when you use string concatenation in Java
+like so: <code>returnString += keys[i];</code> you are actually not just
+appending to <code>returnString</code>, you are creating an entirely new
+string. This is incredibly inefficient because creating a new string
+object takes time too! Specifically, linear in the length of the string
+(we’ll discuss why in a later chapter!).</p>
+<p><strong>Bonus Question:</strong> Let’s say concatenating one
+character to a string takes 1 second. If we have an ArraySet of size 5:
+<code>{1, 2, 3, 4, 5}</code>, how long would it take to run the
+<code>toString()</code> method?</p>
+<p><strong>Answer:</strong> We set <code>returnString</code> to the left
+bracket which takes one second because this involves adding
+<code>{</code> to the empty string <code>""</code>. Adding the first
+element will involve creating an entirely new string, adding } and 1
+which would take 2 seconds. Adding the second element takes 3 seconds
+because we need to add <code>{</code>, <code>1</code>, <code>2</code>.
+This process continues, so for the entire array set the total time is
+<code>1 + 2 + 3 + 4 + 5 + 6 + 7.</code></p>
+<p>To remedy this, Java has a special class called
+<code>StringBuilder</code>. It creates a string object that is mutable,
+so you can continue appending to the same string object instead of
+creating a new one each time.</p>
+<p><strong>Exercise 6.4.2:</strong> Rewrite the toString() method using
+StringBuilder.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="bu">String</span> <span class="fu">toString</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">StringBuilder</span> returnSB <span class="op">=</span> <span class="kw">new</span> <span class="bu">StringBuilder</span><span class="op">(</span><span class="st">&quot;{&quot;</span><span class="op">);</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>            returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span>items<span class="op">[</span>i<span class="op">].</span><span class="fu">toString</span><span class="op">());</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>            returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span><span class="st">&quot;, &quot;</span><span class="op">);</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>        returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span>items<span class="op">[</span>size <span class="op">-</span> <span class="dv">1</span><span class="op">]);</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>        returnSB<span class="op">.</span><span class="fu">append</span><span class="op">(</span><span class="st">&quot;}&quot;</span><span class="op">);</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> returnSB<span class="op">.</span><span class="fu">toString</span><span class="op">();</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<p>Now you’ve successfully overridden the <code>toString()</code>
+method! Try printing the ArraySet to see the fruits of your work.</p>
+<p>Next we will override another important object method:
+<code>equals()</code></p>
+<h2 id="equals-1">equals() <a href="#equals" id="equals"></a></h2>
+<p>{% embed url=“https://www.youtube.com/watch?v=qHuS1o97nfQ” %}</p>
+<p><code>equals()</code> and <code>==</code> have different behaviors in
+Java. <code>==</code> Checks if two objects are actually the same object
+in memory. Remember, pass-by-value! <code>==</code> checks if two boxes
+hold the same thing. For primitives, this means checking if the values
+are equal. For objects, this means checking if the address/pointer is
+equal.</p>
+<p>Say we have this <code>Doge</code> class:</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> Doge <span class="op">{</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="dt">int</span> age<span class="op">;</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="bu">String</span> name<span class="op">;</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="fu">Doge</span><span class="op">(</span><span class="dt">int</span> age<span class="op">,</span> <span class="bu">String</span> name<span class="op">){</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">this</span><span class="op">.</span><span class="fu">age</span> <span class="op">=</span> age<span class="op">;</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">this</span><span class="op">.</span><span class="fu">name</span> <span class="op">=</span> name<span class="op">;</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>   <span class="kw">public</span> <span class="dt">static</span> <span class="dt">void</span> <span class="fu">main</span><span class="op">(</span><span class="bu">String</span><span class="op">[]</span> args<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> y <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">int</span> z <span class="op">=</span> <span class="dv">6</span><span class="op">;</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>      Doge fido <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">5</span><span class="op">,</span> <span class="st">&quot;Fido&quot;</span><span class="op">);</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>      Doge doggo <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">6</span><span class="op">,</span> <span class="st">&quot;Doggo&quot;</span><span class="op">);</span></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>      Doge fidoTwin <span class="op">=</span> <span class="kw">new</span> <span class="fu">Doge</span><span class="op">(</span><span class="dv">5</span><span class="op">,</span> <span class="st">&quot;Fido&quot;</span><span class="op">);</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>      Doge fidoRealTwin <span class="op">=</span> fido<span class="op">;</span></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>If we plug this code into the java visualizer, we will see the box in
+pointer diagram shown below.</p>
+<p><img
+src="https://joshhug.gitbooks.io/hug61b/content/assets/Doge.png" /></p>
+<p><strong>Exercise 6.4.3:</strong> What would java return if we ran the
+following?</p>
+<ul>
+<li><code>x == y</code></li>
+<li><code>x == z</code></li>
+<li><code>fido == doggo</code></li>
+<li><code>fido == fidoTwin</code></li>
+<li><code>fido == fidoRealTwin</code></li>
+</ul>
+<p><strong>Answers</strong></p>
+<ul>
+<li><code>True</code></li>
+<li><code>False</code></li>
+<li><code>False</code></li>
+<li><code>False</code></li>
+<li><code>True</code></li>
+</ul>
+<p><code>fido</code> and <code>fidoTwin</code> are not considered
+<code>==</code> because they point to different objects. However, this
+is quite silly since all their attributes are the same. You can see how
+<code>==</code> can cause some problems in Java testing. When we write
+tests for our ArrayList and want to check if expected is the same as
+what is returned by our function, we create expected as a new arraylist.
+If we used <code>==</code> in our test, it would always return false.
+This is what <code>equals(Object o)</code> is for.</p>
+<h2 id="equalsobject-o-1"><code>equals(Object o)</code>
+<a href="#equalsobject-o" id="equalsobject-o"></a></h2>
+<p><code>equals(Object o)</code> is a method in the Object class that,
+by default, acts like == in that it checks if the memory address of the
+this is the same as o. However, we can override it to define equality in
+whichever way we wish! For example, for two Arraylists to be considered
+equal, they just need to have the same elements in the same order.</p>
+<p><strong>Exercise 6.4.4:</strong> Let’s write an equals method for the
+ArraySet class. Remember, a set is an unordered collection of unique
+elements. So, for two sets to be considered equal, you just need to
+check if they have the same elements.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">equals</span><span class="op">(</span><span class="bu">Object</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span> <span class="op">==</span> other<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>other <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>other<span class="op">.</span><span class="fu">getClass</span><span class="op">()</span> <span class="op">!=</span> <span class="kw">this</span><span class="op">.</span><span class="fu">getClass</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>        ArraySet<span class="op">&lt;</span>T<span class="op">&gt;</span> o <span class="op">=</span> <span class="op">(</span>ArraySet<span class="op">&lt;</span>T<span class="op">&gt;)</span> other<span class="op">;</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>o<span class="op">.</span><span class="fu">size</span><span class="op">()</span> <span class="op">!=</span> <span class="kw">this</span><span class="op">.</span><span class="fu">size</span><span class="op">())</span> <span class="op">{</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span>T item <span class="op">:</span> <span class="kw">this</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(!</span>o<span class="op">.</span><span class="fu">contains</span><span class="op">(</span>item<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
+<p>We added a few checks in the beginning of the method to make sure our
+<code>.equals()</code> can handle nulls and objects of a different
+class. We also optimized the function by returning true right away if
+the == methods returns true. This way, we avoid the extra work of
+iterating through the set.</p>
+<p><strong>Rules for Equals in Java:</strong> Overriding a
+<code>.equals()</code> method may sometimes be trickier than it seems. A
+couple of rules to adhere to while implementing your
+<code>.equals()</code> method are as follows:</p>
+<p>1.) <code>equals</code> must be an equivalence relation</p>
+<ul>
+<li><strong>reflexive</strong>: <code>x.equals(x)</code> is true</li>
+<li><strong>symmetric</strong>: <code>x.equals(y)</code> if and only if
+<code>y.equals(x)</code></li>
+<li><strong>transitive</strong>: <code>x.equals(y)</code> and
+<code>y.equals(z)</code> implies <code>x.equals(z)</code></li>
+</ul>
+<p>2.) It must take an Object argument, in order to override the
+original <code>.equals()</code> method</p>
+<p>3.) It must be consistent if <code>x.equals(y)</code>, then as long
+as <code>x</code> and <code>y</code> remain unchanged: <code>x</code>
+must continue to equal <code>y</code></p>
+<p>4.) It is never true for null <code>x.equals(null)</code> must be
+false</p>
+<h2 id="bonus-video-1">Bonus video
+<a href="#bonus-video" id="bonus-video"></a></h2>
+<p>Create an even better <code>toString</code> method and
+<code>ArraySet.of</code>:</p>
+<p>{% embed url=“https://www.youtube.com/watch?v=tjLpeVD0KWc” %}</p>
+<p>Link to the <a
+href="https://github.com/Berkeley-CS61B/lectureCode-sp23/blob/main/lec11_inheritance4/ArraySet.java">bonus
+code</a></p>
+<h1 id="inheritance-iiii-iterators-object-methods">10. Inheritance IIII:
+Iterators, Object Methods</h1>
+<p>This section covers Lists and Sets, how to throw informative
+exceptions, iterations, and object methods. Its contents correspond to
+Lecture 10.</p>

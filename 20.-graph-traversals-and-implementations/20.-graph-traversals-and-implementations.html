@@ -1,0 +1,322 @@
+<h1 id="bfs-dfs">20.1 BFS &amp; DFS</h1>
+<p>In <a
+href="../19.-tree-traversals-and-graphs/19.4-graph-problems.md">Chapter
+19.4</a>, we developed DFS (Depth First Search) Traversal for graphs. In
+DFS, we visit down the entire lineage of our first child before we even
+begin to look at our second child - we literally search
+<em><strong>depth first</strong></em>.</p>
+<p>Here, we will talk about BFS (Breadth First Search) (also known as
+Level Order Traversal). In BFS, we visit all of our immediate children
+before continuing on to any of our grandchildren. In other words, we
+visit all nodes 1 edges from our source. Then, all nodes 2 edges from
+our source, etc.</p>
+<p>The pseudocode for BFS is as follows:</p>
+<pre><code>Initialize the fringe, an empty queue 
+    add the starting vertex to the fringe
+    mark the starting vertex
+    while fringe is not empty:
+        remove vertex v from the fringe
+        for each neighbor n of vertex v:
+            if n is not marked:
+                add n to fringe
+                mark n
+                set edgeTo[n] = v
+                set distTo[n] = distTo[v] + 1</code></pre>
+<p>A <em>fringe</em> is just a term we use for the data structure we are
+using to store the nodes on the frontier of our traversal’s discovery
+process (the next nodes it is waiting to look at). For BFS, we use a
+queue for our fringe.</p>
+<p><code>edgeTo[...]</code> is a map that helps us track how we got to
+node <code>n</code>; we got to it by following the edge from
+<code>v</code> to to <code>n</code>.</p>
+<p><code>distTo[...]</code> is a map that helps us track how far
+<code>n</code> is from the starting vertex. Assuming that each edge is
+worth a distance of <code>1</code>, then the distance to <code>n</code>
+is just one more than the distance to get to <code>v</code>. Why? We can
+use the way we know how to get to <code>v</code>, then pay one more to
+arrive at <code>n</code> via the edge that necessarily exists between
+<code>v</code> and <code>n</code> (it must exist since in the
+<code>for</code> loop header, <code>n</code> is defined as a neighbor of
+<code>v</code>).</p>
+<p>This <a
+href="https://docs.google.com/presentation/d/1JoYCelH4YE6IkSMq_LfTJMzJ00WxDj7rEa49gYmAtc4/edit#slide=id.g76e0dad85_2_380">slide
+deck</a> illustrates how this pseudocode can be carried out on an
+example graph.</p>
+<h4 id="dfs-vs-bfs">DFS vs BFS
+<a href="#dfs-vs-bfs" id="dfs-vs-bfs"></a></h4>
+<details>
+<summary>
+<strong>Question 18.1</strong>: What graph traversal algorithm uses a
+stack rather than a queue for its fringe?
+</summary>
+<p><strong>Answer 18.1</strong>: DFS traversal.</p>
+</details>
+<p>Note however that DFS and BFS differ in more than just their fringe
+data structure. They differ in the order of marking nodes. For DFS we
+mark nodes only once we visit a node - aka pop it from the fringe. As a
+result, it’s possible to have multiple instances of the same node on the
+stack at a time if that node has been queued but not visited yet. With
+BFS we mark nodes as soon as we add them to the fringe so this is not
+possible.</p>
+<p>Recursive DFS implements this naturally via the recursive stack
+frames; iterative DFS implements it manually:</p>
+<pre><code>Initialize the fringe, an empty stack
+    push the starting vertex on the fringe
+    while fringe is not empty:
+        pop a vertex off the fringe
+        if vertex is not marked:
+            mark the vertex
+            visit vertex
+            for each neighbor of vertex:
+                if neighbor not marked:
+                    push neighbor to fringe</code></pre>
+<p><br />
+</p>
+<h1 id="representing-graphs">20.2 Representing Graphs</h1>
+<p>We will discuss our choice of <strong>API</strong>, and also the
+<strong>underlying data structures</strong> used to represent the graph.
+Our decisions can have profound implications on our <em>runtime</em>,
+<em>memory usage</em>, and <em>difficulty of implementing various graph
+algorithms</em>.</p>
+<h3 id="graph-api">Graph API
+<a href="#graph-api" id="graph-api"></a></h3>
+<p>An API (Application Programming Interface) is a list of methods
+available to a user of our class, including the method signatures (what
+arguments/parameters each function accepts) and information regarding
+their behaviors. You have already seen APIs from the Java developers for
+the classes they provide, such as the <a
+href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Deque.html">Deque</a>.</p>
+<p>For our Graph API, let’s use the common convention of assigning each
+unique node to an integer number. This can be done by maintaining a map
+which can tell us the integer assigned to each original node label.
+Doing so allows us to define our API to work with integers specifically,
+rather than introducing the need for generic types.</p>
+<p>We can then define our API to look something like this perhaps:</p>
+<pre><code>public class Graph {
+  public Graph(int V):               // Create empty graph with v vertices
+  public void addEdge(int v, int w): // add an edge v-w
+  Iterable&lt;Integer&gt; adj(int v):      // vertices adjacent to v
+  int V():                           // number of vertices
+  int E():                           // number of edges
+...</code></pre>
+<p>Clients (people who wish to use our Graph data structure), can then
+use any of the functions we provide to implement their own algorithms.
+The methods we provide can have a significant impact on how
+easy/difficult it may be for our clients to implement particular
+algorithms.</p>
+<p>Now that we know how to draw a graph on paper and understand the
+basic concepts and definitions, we can now consider how a graph should
+be represented inside of a computer. We want to be able to get quick
+answers for the following questions about a graph:</p>
+<ul>
+<li>Are given vertices <code>u</code> and <code>v</code> adjacent?</li>
+<li>Is vertex <code>v</code> incident to a particular edge
+<code>e</code>?</li>
+<li>What vertices are adjacent to <code>v</code>?</li>
+<li>What edges are incident to <code>v</code>?</li>
+</ul>
+<p>Imagine that we want to represent a graph that looks like this:</p>
+<p><img src="../.gitbook/assets/image%20(81).png" /></p>
+<p>One data structure we could use to implement this graph is called an
+<em>array of adjacency lists</em>.</p>
+<h2 id="the-adjacency-list">The Adjacency List</h2>
+<p>In an adjacency list, an array is created that has the same size as
+the number of vertices in the graph. Each position in the array
+represents one of the vertices in the graph. Each of these positions
+point to a list. These lists are called adjacency lists, as each element
+in the list represents a neighbor of the vertex.</p>
+<p>The array of adjacency lists that represents the above graph looks
+like this:</p>
+<p><img src="../.gitbook/assets/image%20(68).png" /></p>
+<p><br />
+Another data structure we could use to represent the edges in a graph is
+called an <em>adjacency matrix</em>.</p>
+<h2 id="the-adjacency-matrix">The Adjacency Matrix</h2>
+<p>In this data structure, we have a two dimensional array of size N×N
+(where N is the number of vertices) which contains boolean values. The
+(<em>i</em>, <em>j</em>)th entry of this matrix is true when there is an
+edge from <em>i</em> to <em>j</em> and false when no edge exists. Thus,
+each vertex has a row and a column in the matrix, and the value in that
+table says true or false whether or not that edge exists.</p>
+<p>The adjacency matrix that represents the above graph looks like
+this:</p>
+<p><img src="../.gitbook/assets/image%20(34).png" /></p>
+<h2 id="efficiency">Efficiency
+<a href="#efficiency" id="efficiency"></a></h2>
+<p>Your choice of underlying data structure can impact the runtime and
+memory usage of your graph. This table from the <a
+href="https://docs.google.com/presentation/d/11iacyiFt3QUrzo1yAU_xoXAjGTH4UzV7o6CR04HYRrI/edit#slide=id.g54593997ea_0_422">slides</a>
+summarizes the efficiencies of each representation for various
+operations. It is strongly not recommended to directly just copy this on
+to your cheatsheet for the exams without taking the time to first
+understand where and how these bounds fundamentally came to be. The
+lecture contains walkthroughs explaining the rationale in detail behind
+several of these cells.</p>
+<p>Further, DFS/BFS on a graph backed by adjacency lists runs in O(V+E),
+while on a graph backed by an adjacency matrix runs in O(V^2). See the
+<a
+href="https://docs.google.com/presentation/d/11iacyiFt3QUrzo1yAU_xoXAjGTH4UzV7o6CR04HYRrI/">slides</a>
+for help in understanding why.</p>
+<h1 id="summary">20.3 Summary</h1>
+<h2 id="graph-traversals-overview">Graph Traversals Overview</h2>
+<ul>
+<li>The same traversals that we used on trees can be generalized to
+graphs. Given a source vertex, we can visit vertices in:
+<ul>
+<li>DFS preorder: the order in which DFS is called on each vertex.</li>
+<li>DFS postorder: the order in which DFS returns from each vertex.</li>
+<li>BFS: the order of distance from the source node (this is level-order
+in trees). </li>
+</ul></li>
+</ul>
+<h2 id="bfs">BFS</h2>
+<ul>
+<li>Unlike DFS, BFS has a natural solution that is iterative, not
+recursive. BFS visits a source vertex <code>s</code>, then every vertex
+at distance <code>1</code> from <code>s</code>, then every vertex at
+distance <code>2</code> from <code>s</code>, and so on.</li>
+<li>BFS uses a <em>fringe</em> of vertices that are next to be explored.
+In BFS, this fringe is a queue. We enqueue new vertices at the end, and
+dequeue vertices to visit from the front.</li>
+<li>BFS can be used to solve the shortest paths problem, given that we
+want to minimize the number of edges from source to each other vertex.
+If we want to recover the shortest path from BFS, we need to track the
+<code>edgeTo</code> each vertex during our traversal.</li>
+</ul>
+<h2 id="graph-implementation">Graph Implementation</h2>
+<ul>
+<li>The choice of API for a graph determines how clients must write
+their code. Certain APIs make some tasks easier and other tasks harder.
+The choice of API can also affect runtime and memory.</li>
+<li>Choice of graph implementations include adjacency matrices, lists of
+edges, and adjacency lists. An adjacency matrix is a 2D boolean array
+indicating whether any pair of vertices are adjacent. A list of edges is
+a collection of all edges in the graph. </li>
+<li>The most common approach to graph representation is an adjacency
+list. In this representation, we maintain a array of lists indexed by
+vertex number; each index stores all vertices connected to the given
+vertex.</li>
+</ul>
+<h1 id="exercises">20.4 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>Suppose we want to find the vertex with minimal degree (fewest
+neighbors). Is an adjacency matrix or adjacency list better?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>An adjacency list would be better: we can just assess the size of
+each list in constant time versus iterating over all <span
+class="math display"><em>V</em></span> vertices in each row of the
+adjacency matrix to count the number of neighbors.</p>
+</details>
+<h2 id="procedural">Procedural</h2>
+<p><img src="../.gitbook/assets/image%20(71).png" /></p>
+<ol type="1">
+<li>For the graph above, write the representation for the adjacency
+matrix representation.</li>
+<li>Repeat (1) for the list of edges representation.</li>
+<li>Repeat (1) for the adjacency list representation.</li>
+<li>Run BFS starting from A for the graph above, and list the order in
+which vertices are visited. Break ties alphabetically.</li>
+<li>Run DFS starting from A for the graph above, and list the
+postorder/postorder traversals. Break ties alphabetically.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<pre><code><strong>    A  B  C  D  E  F
+</strong><strong>   
+</strong><strong>A   F  T  F  F  F  F
+</strong><strong>B   T  F  T  T  T  F
+</strong><strong>C   F  T  F  F  F  T
+</strong><strong>D   F  T  F  F  F  T
+</strong><strong>E   F  T  F  F  F  F
+</strong><strong>F   F  F  T  T  F  F
+</strong></code></pre>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<pre><code>[{A, B}, 
+{B, A}, {B, C}, {B, D}, {B, E}, 
+{C, B}, {C, F},
+{D, B}, {D, F},
+{E, B}, 
+{F, C}, {F, D}]</code></pre>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<pre><code>A: [B]
+B: [A, C, D, E]
+C: [B, F]
+D: [B, F]
+E: [B]
+F: [C, D]</code></pre>
+</details>
+<details>
+<summary>
+Problem 4
+</summary>
+<p><code>[A, B, C, D, E, F]</code></p>
+</details>
+<details>
+<summary>
+Problem 5
+</summary>
+<p>preorder: <code>[A, B, C, F, D, E]</code></p>
+<p>postorder: <code>[D, F, C, E, B, A]</code></p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Suppose we find some shortest path from <code>a</code> to
+<code>b</code> using BFS. Consider a vertex <code>c</code> that is on
+the path between <code>a</code> and <code>b</code>. What can we say
+about the shortest path from <code>c</code> to <code>b</code>?</li>
+<li>Problem 4c from the <a
+href="https://drive.google.com/file/d/1uE1QlF4YguWVp8m8UJ97R2xPC4b1NnQ5/view?usp=sharing">Spring
+2015 Midterm 2</a>.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Call the original shortest path from <code>a</code> to <code>b</code>
+<span
+class="math display"><em>p</em><sub><em>a</em><em>b</em></sub></span>,
+and the path from <code>c</code> to <code>b</code> along this path <span
+class="math display"><em>p</em><sub><em>c</em><em>b</em></sub><sup>*</sup></span>.
+If there is some shorter path between <code>c</code> and <code>b</code>
+<span
+class="math display"><em>p</em><sub><em>c</em><em>b</em></sub><sup>′</sup></span>,
+then we could simply take the path from <code>a</code> to <code>c</code>
+in the original <span
+class="math display"><em>p</em><sub><em>a</em><em>b</em></sub></span>,
+then take <span
+class="math display"><em>p</em><sub><em>c</em><em>b</em></sub><sup>′</sup></span>
+to find an even shorter path between <code>a</code> and <code>b</code>.
+</p>
+<p>However, we stated earlier that <span
+class="math display"><em>p</em><sub><em>a</em><em>b</em></sub></span> is
+the shortest path between <code>a</code> and <code>b</code>. This is a
+contradiction.</p>
+<p>Thus, the shortest path between <code>c</code> and <code>b</code>
+must be on the shortest path between <code>a</code> and
+<code>b</code>.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><a
+href="https://drive.google.com/file/d/1IYt4VbzdX4dTekh6cYAC8tigpJ_LgljV/view?usp=sharing">Solutions</a>
+are linked here and on the course website.</p>
+</details>
+<h1 id="graph-traversals-and-implementations">20. Graph Traversals and
+Implementations</h1>

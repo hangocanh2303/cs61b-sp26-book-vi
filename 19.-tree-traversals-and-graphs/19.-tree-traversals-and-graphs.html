@@ -1,0 +1,365 @@
+<h1 id="tree-recap">19.1 Tree Recap</h1>
+<h2 id="trees-and-traversals">Trees and Traversals
+<a href="#trees-and-traversals" id="trees-and-traversals"></a></h2>
+<h3 id="what-is-a-tree">What is a Tree?</h3>
+<p>Recall that a tree consists of:</p>
+<ul>
+<li>A set of connected nodes (or vertices). We use both terms
+interchangeably.</li>
+<li>A set of edges that connect those nodes. No edges can form a cycle.
+<ul>
+<li><strong>Constraint:</strong> There is exactly one path between any
+two nodes.</li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-02-26 at 6.04.39 AM.png" alt="">
+<figcaption>
+<p>
+Graph Examples (Some Trees, some not…)
+</p>
+</figcaption>
+</figure>
+<p>Graph #1 is a tree. It has a node. It has no edges. That’s
+<em>OK</em>!</p>
+<p>The second and third structures are trees. Notice that the third is a
+LinkedList. A LinkedList is still a tree as it is a connected acyclic
+graph.</p>
+<p>The fourth is not a tree. Why? There are two paths from the top node
+to the bottom node, and so this does not obey our constraint.</p>
+<p><strong>Exercise 17.1.1.</strong> Determine the reason why the fifth
+structure is not a tree. Also, modify the invalid trees above so that
+they are valid.</p>
+<h3 id="what-is-a-rooted-tree">What is a rooted tree?
+<a href="#what-is-a-rooted-tree" id="what-is-a-rooted-tree"></a></h3>
+<p><br />
+Recall that a rooted tree is a tree with a designated root (typically
+drawn as the top most node.)</p>
+<p>This gives us the notion of two more definitions</p>
+<ul>
+<li>A parent. Every node except the root has exactly one parent.
+<ul>
+<li>What if a node had 2 parents? Would it be a tree? (Hint: No.)</li>
+</ul></li>
+<li>A child. A node can have 0 or more children.
+<ul>
+<li>What if a node has 0 children? It’s called a leaf.</li>
+</ul></li>
+</ul>
+<h3 id="what-are-trees-useful-for">What are trees useful for?
+<a href="#what-are-trees-useful-for" id="what-are-trees-useful-for"></a></h3>
+<p><br />
+So far, we’ve looked at Search Trees, Tries, Heaps, Disjoint Sets, etc.
+These were extremely useful in our journey to create efficient
+algorithms: speeding up searching for items, allowing prefixing,
+checking connectedness, and so on.</p>
+<p>But the fact of the matter is that they are even more ubiquitous than
+we realize. Consider an organization chart. Here, the President is the
+‘root’. The ’VP’s are children of the root, and so on.</p>
+<figure>
+<img src="../.gitbook/assets/image (110).png" alt="">
+<figcaption>
+<p>
+Organization Chart
+</p>
+</figcaption>
+</figure>
+<p><br />
+Another tree structure is the <code>61b/</code> directory on your
+Desktop (it is on your Desktop, isn’t it?). As we can see, when you
+traverse to a subfolder it goes to subsequent subfolders and so on. This
+is exactly tree-like!</p>
+<p><br />
+<strong>Exercise 17.1.2.</strong> Think of other common uses of trees
+that weren’t mentioned above. Try and determine possible implementations
+or designs of these trees. </p>
+<p><a href="https://joshhug.gitbooks.io/hug61b/content/chap17/"><br />
+</a></p>
+<h1 id="tree-traversals">19.2 Tree Traversals</h1>
+<h2 id="tree-iteration-traversal">Tree <del>Iteration</del> Traversal
+<a href="#tree-iteration-traversal" id="tree-iteration-traversal"></a></h2>
+<p>Remember how we learned to iterate through lists? There was a way to
+iterate through lists that felt natural. Just start at the beginning…
+and keep going.</p>
+<p>Or maybe we did some things that were a little strange, like iterate
+through the reverse of the list. Recall we also wrote iterators in <a
+href="https://sp19.datastructur.es/materials/discussion/disc05.pdf">discussion</a>
+to skip over students who didn’t write descriptions on the Office Hours
+queue.</p>
+<p>Now how do you iterate over a tree? What’s the correct ‘order’?</p>
+<p>Before we answer that question, we must not use the word iteration.
+Instead, we’ll call it ‘traversing through a tree’ or a ‘tree
+traversal’. Why? No <strong>real</strong> reason, except that everyone
+calls iteration through trees ‘traversals’. Maybe it’s because the world
+likes alliterations.</p>
+<p>So what are some natural ways to ‘traverse’ through a tree? As it
+turns out, there are a few –– unlike a list which basically has one
+natural way to iterate through it:</p>
+<ol type="1">
+<li>Level order traversal. Breadth First Search (BFS)</li>
+<li>Depth-First traversals –– of which there are three: pre-order,
+in-order and post-order. (DFS)</li>
+</ol>
+<p>Let’s test out these traversals mentioned above on the tree
+below.</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-02-26 at 6.29.34 AM.png" alt="">
+<figcaption>
+<p>
+Different Traversals on One Tree…
+</p>
+</figcaption>
+</figure>
+<h3 id="section"></h3>
+<h3 id="level-order-traversal">Level Order Traversal</h3>
+<p><br />
+We’ll iterate by levels, left to right. Level 0? D. Level 1? B and then
+F. Level 2? A, C, E, and G.</p>
+<p>This gives us <code>D B F A C E G</code>.</p>
+<p>Imagine each level was a sentence in an english book, and we just
+read it off line by line.</p>
+<p><strong>Exercise 17.2.1.</strong> Write the code for performing a
+level order traversal (warning, this is more difficult than the writing
+the other traversals). <em>Hint</em>: You will want to keep track of
+what level you are at.</p>
+<h3 id="pre-order-traversal">Pre-order Traversal</h3>
+<p>Here’s the idea behind pre-order traversal. Start at the root.
+<strong>Visit the root</strong> (aka, do the <strong>action</strong> you
+want to do.) The action here is “print”.</p>
+<p>So, we’ll print the root. D. There we go.</p>
+<p>Now, go left, and recurse. Then, go right and recurse.</p>
+<p>So now we’ve gone left. We’re at the B node. Print it. B. We’ll go
+left after printing. (Remember, after we’re done with B’s left branch,
+we’ll come back up and visit B’s right.)</p>
+<p>Keep following this logic, and you get
+<code>D B A C F E G</code>.<br />
+</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">preOrder</span><span class="op">(</span>BSTNode x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span><span class="op">(</span>x<span class="op">.</span><span class="fu">key</span><span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">preOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">left</span><span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">preOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">right</span><span class="op">)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><br />
+</p>
+<h3 id="in-order-traversal">In-order Traversal</h3>
+<p>Slightly different, but same big-picture idea. Here, instead of
+<strong>visiting</strong> (aka <strong>printing</strong>) first, we’ll
+first visit the left branch. Then we’ll print. Then we’ll visit the
+right branch.</p>
+<p>So we start at D. We don’t print. We go left.</p>
+<p>We start at B. We don’t print. We go left.</p>
+<p>We start at A. We don’t print. We go left. We find nothing. We come
+back up, and print A.</p>
+<p>Then go to A’s right. Find nothing. Go back up. Now we’re at B.
+Remember, we print after visiting left and before visiting right, so now
+we’ll print B, then we’ll visit right.</p>
+<p>Keep following this and you get <code>A B C D E F G</code>.</p>
+<p><strong>An alternative</strong> way to think about this is as
+follows:</p>
+<p>First, we’re at D. We know we’ll print out the items from left, then
+D, then items from right.</p>
+<p>[items from left] D [items from right].</p>
+<p>Now what’s [items from left] equal to? We’ll start at B, print out
+left, then print B, then print stuff from right of B.</p>
+<p>[items from left] = [items from B’s left] B [items from B’s right] =
+A B C.</p>
+<p>A B C D [stuff from right] = A B C D E F G.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inOrder</span><span class="op">(</span>BSTNode x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="cf">return</span><span class="op">;</span>    </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">left</span><span class="op">)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span><span class="op">(</span>x<span class="op">.</span><span class="fu">key</span><span class="op">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">right</span><span class="op">)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="post-order-traversal">Post-order Traversal</h3>
+<p>Again, same big-picture idea, but now we’ll print left branch, then
+right branch, then ourselves.</p>
+<p>Using the method we devised earlier, the result looks like:</p>
+<p>[items from left] [items from right] D.</p>
+<p>What’s [items from left]? It’s the output from the B subtree.</p>
+<p>If we’re at B, we’d get [items from left of B] [items from right of
+B] B, which is equal to A C B.</p>
+<p>Following this through, we get: <code>A C B E G F D</code></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">postOrder</span><span class="op">(</span>BSTNode x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>x <span class="op">==</span> <span class="kw">null</span><span class="op">)</span> <span class="cf">return</span><span class="op">;</span>    </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">postOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">left</span><span class="op">)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">postOrder</span><span class="op">(</span>x<span class="op">.</span><span class="fu">right</span><span class="op">)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span><span class="op">(</span>x<span class="op">.</span><span class="fu">key</span><span class="op">)</span>   </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="graphs">19.3 Graphs</h1>
+<p>Trees are great, aren’t they? But as we saw, we could draw some
+things using nodes and edges that weren’t trees. Specifically, our
+restriction that there can only be one path between any two nodes didn’t
+fit every situation. Let’s see what happens when we get rid of that
+restriction.</p>
+<h3 id="what-is-a-graph">What is a graph?
+<a href="#what-is-a-graph" id="what-is-a-graph"></a></h3>
+<p>A graph consists of:</p>
+<ul>
+<li>A set of nodes (or vertices)</li>
+<li>A set of zero of more edges, each of which connects two nodes.</li>
+</ul>
+<p>That’s it! No other restrictions.</p>
+<p>All of the structures below in green? Everything is a valid graph!
+The second one is also a tree, but none of the others are.</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-02-26 at 2.02.16 PM.png" alt="">
+<figcaption>
+<p>
+Graphs
+</p>
+</figcaption>
+</figure>
+<p>In general, note that <strong>all trees are also graphs, but not all
+graphs are trees.</strong></p>
+<h3 id="simple-graphs-only">Simple Graphs only
+<a href="#simple-graphs-only" id="simple-graphs-only"></a></h3>
+<p>Graphs can be divided into two categories: <em>simple</em> graphs and
+<em>multigraphs</em> (or complicated graphs, a term I invented, because
+that’s how I like to think of them.) Fortunately, in this course (and
+almost all applications and research) focuses only on simple graphs. So
+when we say “graph” in this course, you should always think of a “simple
+graph” (unless we say otherwise.)</p>
+<p>Well, it’s time to address the elephant in the room. What’s a simple
+graph?</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-02-26 at 2.03.21 PM.png" alt="">
+<figcaption>
+<p>
+Simple Graphs and Multigraphs
+</p>
+</figcaption>
+</figure>
+<p>Look at the graphs in red. The graph in the middle has 2 distinct
+edges going from/to bottom-next to/from bottom-left node. In other
+words, there are multiple edges between two nodes. This is
+<strong>not</strong> a simple graph, and we ignore their existence
+unless specified otherwise. Graphs like these are called
+multigraphs.</p>
+<p>Look at the third graph. It has a loop! An edge from a node to
+itself! We don’t allow this either. Graphs like these are sometimes
+categorized as multigraphs, and sometimes, even multigraphs explicitly
+ban self-loops.</p>
+<h3 id="more-categorizations.">More categorizations.
+<a href="#more-categorizations" id="more-categorizations"></a></h3>
+<p>Graphs are simple in the following text, and in this course, unless
+specified otherwise. But there are more categorizations.</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-02-26 at 2.04.26 PM.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>There are undirected graphs, where an edge <code>(u, v)</code> can
+mean that the edge goes from the nodes u to v and from the nodes v to u
+too. There are directed graphs, where the edge <code>(u, v)</code> means
+that the edge starts at u, and goes to v (and the vice versa is not
+true, unless the edge <code>(v, u)</code> also exists.) Edges in
+directed graphs have an arrow.</p>
+<p>There are also acyclic graphs. These are graphs that don’t have any
+cycles. And then there are cyclic graphs, i.e., there exists a way to
+start at a node, follow some <strong>unique</strong> edges, and return
+back to the same node you started from.</p>
+<p>In the above picture, we can clearly see the difference between how
+we draw directed and undirected edges.</p>
+<p>Take a look at the cyclic graphs. If you start at <code>a</code>, you
+can run back around using only distinct edges and get back to
+<code>a</code>. Thus, the graph is cyclic.</p>
+<p>Take a look at the top-left graph. Is there any node <code>n</code>,
+such that if you start at <code>n</code>, you can follow some distinct
+edges, and get back to <code>n</code>? Nope! (Remember than for directed
+edges, you must follow the directions. You can go from <code>a</code> to
+<code>b</code> but not <code>b</code> to <code>a</code>.)</p>
+<h1 id="graph-problems">19.4 Graph Problems</h1>
+<p>There are many questions we can ask about a graph.</p>
+<p>For example,</p>
+<ul>
+<li><strong>s-t Path</strong>: Is there a path between vertices s and
+t?</li>
+<li><strong>Connectivity</strong>: Is the graph connected, i.e. is there
+a path between all vertices?</li>
+<li><strong>Biconnectivity</strong>: Is there a vertex whose removal
+disconnects the graph?</li>
+<li><strong>Shortest s-t Path</strong>: What is the shortest path
+between vertices s and t?</li>
+<li><strong>Cycle Detection</strong>: Does the graph contain any
+cycles?</li>
+<li><strong>Euler Tour</strong>: Is there a cycle that uses every edge
+exactly once?</li>
+<li><strong>Hamilton Tour</strong>: Is there a cycle that uses every
+vertex exactly once?</li>
+<li><strong>Planarity</strong>: Can you draw the graph on paper with no
+crossing edges?</li>
+<li><strong>Isomorphism</strong>: Are two graphs isomorphic (the same
+graph in disguise)?</li>
+</ul>
+<p>What’s cool and also weird about graph problems is that it’s very
+hard to <em>tell</em> which problems are very hard, and which ones
+aren’t all that hard.</p>
+<p>For example, consider the Euler Tour and the Hamilton Tour problems.
+The former… is a solved problem. It was solved as early as 1873. The
+solution runs in O(E) where E is the number of edges in the graph.</p>
+<p>The latter? If you were to solve it efficiently today, you would win
+every Math award there was, become one of the most famous computer
+scientists, win a million dollars, etc. No one has been able to solve
+this <strong>efficiently</strong>. The best known algorithms run in
+exponential times. People have been working on it for many decades!</p>
+<h3 id="one-step-at-a-time">One step at a time!
+<a href="#one-step-at-a-time" id="one-step-at-a-time"></a></h3>
+<p>Alright, well, before we solve the million dollar problem, let’s
+solve the first one on the list. Given a source vertex s and a target
+vertex t, is there a path between s and t?</p>
+<p>In other words, write a function <code>connected(s, t)</code> that
+takes in two vertices and returns whether there exists a path between
+the two.</p>
+<p>To begin, let’s guess that we have the following code:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>s <span class="op">==</span> t<span class="op">):</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> child in <span class="fu">neighbors</span><span class="op">(</span>s<span class="op">):</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">isconnected</span><span class="op">(</span>child<span class="op">,</span> t<span class="op">):</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code></pre></div>
+<p><strong>Exercise 17.4.1.</strong> Before you move on, please read the
+code above, and spend time thinking about it. Does it work? Is it
+efficient? Run through a couple scenarios.</p>
+<p>Alright, so, let’s try it out.</p>
+<p>We start with <code>connected(0, 7)</code>? That recursively calls
+<code>connected(1, 7)</code>, which then recursively calls
+<code>connected(0, 7)</code>. Uh-oh. Infinite looping has occurred.</p>
+<p><strong>Exercise 17.4.2.</strong> How could we fix this? Once again,
+thinking about this. What was the problem? We visited <code>s</code>
+again… but did we need to?</p>
+<p>Alright, let’s try a “remember what we visited” approach.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mark s  <span class="co">// i.e., remember that you visited s already</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>s <span class="op">==</span> t<span class="op">):</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> child in <span class="fu">unmarked_neighbors</span><span class="op">(</span>s<span class="op">):</span> <span class="co">// if a neighbor is marked, ignore!</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">isconnected</span><span class="op">(</span>child<span class="op">,</span> t<span class="op">):</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code></pre></div>
+<p>As it turns out, this does work! Follow the example in <a
+href="https://docs.google.com/presentation/d/1OHRI7Q_f8hlwjRJc8NPBUc1cMu5KhINH1xGXWDfs_dA/edit#slide=id.g76e0dad85_2_380">these
+slides</a> to see how.</p>
+<h3 id="woah-what-did-we-just-develop">Woah, what did we just develop?
+<a href="#woah-what-did-we-just-develop" id="woah-what-did-we-just-develop"></a></h3>
+<p>You may not have realized it, but we just developed a
+<strong>depth-first traversal</strong> (like pre-order, post-order,
+in-order) but for graphs. What did we do? Well, we marked ourself. Then
+we visited our first child. Then our first child marked itself, and
+visited its children. Then our first child’s first child marked itself,
+and visited its children.</p>
+<p>Intuitively, we’re going deep (i.e., down our family tree to our
+first child, our first child’s first child aka our first grandchild, our
+first grandchild’s first child, and so on… visiting this entire
+lineage), before we even touch our second child.</p>
+<p>Up next, we’ll see the opposite notion, where first we visit all our
+children, then our grandchildren, and so on.</p>
+<h1 id="tree-traversals-and-graphs">19. Tree Traversals and Graphs</h1>

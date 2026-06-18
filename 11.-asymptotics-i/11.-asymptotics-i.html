@@ -1,0 +1,773 @@
+<h1 id="an-introduction-to-asymptotic-analysis">11.1 An Introduction to
+Asymptotic Analysis</h1>
+<p>Previously, we have focused on how to save time <em>writing</em> the
+program. Now, we will learn how to make the best use of our computer’s
+time and memory. </p>
+<p>We can consider the process of writing efficient programs from two
+different perspectives:</p>
+<ol type="1">
+<li>Programming Cost <em>(everything in the course up to this date)</em>
+<ol type="1">
+<li>How long does it take for you to develop your programs?</li>
+<li>How easy is it to read or modify your code?</li>
+<li>How maintainable is your code? (very important — much of the cost
+comes from maintenance and scalability, not development!)</li>
+</ol></li>
+<li>Execution Cost <em>(everything in the course from this point
+on)</em>
+<ol type="1">
+<li><strong>Time complexity</strong>: How much time does it take for
+your program to execute?</li>
+<li><strong>Space complexity</strong>: How much memory does your program
+require?</li>
+</ol></li>
+</ol>
+<p>To give a sense of what is coming up, consider a
+<strong>sorted</strong> array. Our goal is to determine if there is a
+duplicate element in the list.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">List</span><span class="op">&lt;</span><span class="bu">Integer</span><span class="op">&gt;</span> example <span class="op">=</span> <span class="op">[-</span><span class="dv">3</span><span class="op">,</span> <span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">10</span><span class="op">,</span> <span class="dv">12</span><span class="op">];</span></span></code></pre></div>
+<p>A <strong>naïve algorithm</strong> would be to compare every pair of
+elements. In the above example, we would compare -3 with every element
+in the list, then -1, then 2, etc. </p>
+<p>A <strong>better algorithm</strong> would be to take advantage of the
+sorted nature of the list! Instead of comparing every pair of elements,
+we can compare each element with just the element next to it.</p>
+<p>We can see that the <strong>naïve algorithm</strong> seems like it’s
+doing a lot more unnecessary, redundant work than the <strong>better
+algorithm</strong>. But how much more work is it doing? How do we
+quantify how efficient a program is? This chapter will provide you the
+formal techniques and tools to compare the efficiency of various
+algorithms!</p>
+<h1 id="runtime-characterization">11.2 Runtime Characterization</h1>
+<p>We want to be able to <em>characterize</em> the runtime of the two
+algorithms we previously saw. In other words, we want to come up with
+some proxy that communicates the overall performance of each algorithm.
+</p>
+<p>When characterizing runtimes, we have two goals in mind:</p>
+<ul>
+<li>They should be simple but mathematically rigorous.</li>
+<li>They should clearly demonstrate the superiority of one algorithm
+over another if one algorithm is better than the other. </li>
+</ul>
+<p>{% embed
+url=“https://www.youtube.com/watch?ab_channel=JoshHug&amp;v=mRn8Z46psX8”
+%}</p>
+<p>We have converted both the naïve algorithm and the better algorithm
+into Java code. The function dup1 corresponds to the naïve algorithm and
+dup2 corresponds to the better algorithm.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Naïve algorithm: compare everything</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">static</span> <span class="dt">boolean</span> <span class="fu">dup1</span><span class="op">(</span><span class="dt">int</span><span class="op">[]</span> A<span class="op">)</span> <span class="op">{</span>  </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span><span class="op">;</span> j <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> A<span class="op">[</span>j<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Better algorithm: compare only neighbors</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="dt">static</span> <span class="dt">boolean</span> <span class="fu">dup2</span><span class="op">(</span><span class="dt">int</span><span class="op">[]</span> A<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span> <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> A<span class="op">[</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">])</span> <span class="op">{</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="technique-1">Technique 1</h3>
+<p>The first technique we will consider using for runtime
+characterization is directly measuring execution time in seconds using a
+client program. </p>
+<p>There are a few ways we could do this:</p>
+<ul>
+<li>Use a physical stopwatch (not recommended).</li>
+<li>Use Unix’s built in <code>time</code> command.</li>
+<li>Use the Princeton Standard library which has a
+<code>stopwatch</code> class.</li>
+</ul>
+<p>Using any of these methods will show (with varying levels of
+accuracy, depending on whether the physical stopwatch path was chosen)
+that as input size increases, <code>dup1</code> takes a longer time to
+complete, whereas <code>dup2</code> completes at relatively around the
+same rate.</p>
+<p>It seems like technique 1 works perfectly fine for characterizing our
+runtimes! It is very easy to understand the results of the experiment,
+and it is easy to implement. However, there are some serious cons
+associated it that dissuades us from using it for everything:</p>
+<ul>
+<li>It could take a <em>long</em> time to finish running. </li>
+<li>Running times can vary by machine, compiler, input data, etc. </li>
+</ul>
+<p>For these reasons, technique 1 does not meet our goals in
+characterizing runtimes. It’s simple, but it’s not mathematically
+rigorous. Moreover, the differences based on machine, compiler, input,
+etc. mean that the results may not clearly demonstrate the relationship
+between <code>dup1</code> and <code>dup2</code>.</p>
+<p>{% embed
+url=“https://www.youtube.com/watch?ab_channel=JoshHug&amp;v=fxDIy6w09fw”
+%}</p>
+<h3 id="technique-2a">Technique 2A</h3>
+<p>Rather than physically timing the amount of time it takes for the
+algorithm to run, we can instead count the total number of operations
+completed by each algorithm! Intuitively, the algorithm that runs the
+fewer number of operations would be superior to the other. We can fix
+the input size <code>N</code> to be the same for both algorithms and
+compare the number of operations run. </p>
+<p>Let us apply this to the <code>dup1</code> algorithm with an input
+size of <code>N=10000</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> i<span class="op">+</span><span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span><span class="op">;</span> j <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> A<span class="op">[</span>j<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>       <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Count (for N=10000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>1 (in the best case) to 10000 (in the worst case)</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>2 to 50,015,001</td>
+</tr>
+<tr>
+<td>+= 1</td>
+<td>0 to 50,005,000</td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to 49,995,000</td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to 99,990,000</td>
+</tr>
+</tbody>
+</table>
+<p>The operation <code>i = 0</code> is only run a single time at the
+very start of the function call. <code>j = i+1</code> is more
+complicated–in the best case when <code>A[0] == A[1]</code>, it only
+runs a single time (convince yourself of this fact!). In the worst case,
+<code>j</code> is initialized once for each value that <code>i</code>
+takes on in the outer loop, so it is initialized a total of 10000 times.
+</p>
+<p>As we dive further into the loop, it gets progressively less feasible
+to calculate the exact counts. We will show later on that the exact
+numbers do not matter that much. </p>
+<p>To summarize technique 2A, we have solved the issue of <em>machine
+independence</em>. Differences in machines do not affect the total of
+operations run (usually). However, it is tedious to compute all the
+counts for each operation. In addition, our chosen input size is
+arbitrary, and we do not know how much time it actually takes to run.
+</p>
+<h3 id="technique-2b">Technique 2B</h3>
+<p>We can resolve the issue of choosing input size by calculating the
+<em>symbolic count</em> instead, which means that we calculate our
+counts in terms of the input <code>N</code>. Using this technique, we
+can update our table to include the symbolic counts:</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 24%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Symbolic Count</th>
+<th>Count (for N=10000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>1 to N</td>
+<td>1 (in the best case) to 10000 (in the worst case)</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>2 to (N² + 3N + 2)/2</td>
+<td>2 to 50,015,001</td>
+</tr>
+<tr>
+<td>+= 1</td>
+<td>0 to (N² + N)/2</td>
+<td>0 to 50,005,000</td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to (N² - N)/2</td>
+<td>1 to 49,995,000</td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to N²-N</td>
+<td>2 to 99,990,000</td>
+</tr>
+</tbody>
+</table>
+<p>Using symbolic counts allows us to see how the algorithms
+<em>scales</em> with input size. However, it is now even more tedious to
+calculate! It also still does not tell the actual time.</p>
+<h1 id="checkpoint-an-exercise">11.3 Checkpoint: An Exercise</h1>
+<p>Exercise: Apply techniques 2A and 2B to <code>dup2</code>.</p>
+<ul>
+<li>Calculate the counts of each operation for the following code with
+respect to N.</li>
+<li>Predict the <em><strong>rough</strong></em> magnitudes of each
+one.</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">.</span><span class="fu">length</span> <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">){</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> A<span class="op">[</span>i <span class="op">+</span> <span class="dv">1</span><span class="op">])</span> <span class="op">{</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code></pre></div>
+<p>{% embed
+url=“https://www.youtube.com/watch?ab_channel=JoshHug&amp;v=IxQh6SXRBRw”
+%}</p>
+<h4 id="solution">Solution:</h4>
+<p>Note: It’s okay if you were slightly off—as mentioned earlier, you
+want <em><strong>rough</strong></em> estimates.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Symbolic Count</th>
+<th>Count (for N=10000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>0 to <span class="math display"><em>N</em></span></td>
+<td>0 to 10,000</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>0 to <span class="math display"><em>N</em> − 1</span></td>
+<td>0 to 9,999</td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to <span class="math display"><em>N</em> − 1</span></td>
+<td>1 to 9,999</td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to <span class="math display">2<em>N</em> − 2</span></td>
+<td>2 to 19998</td>
+</tr>
+</tbody>
+</table>
+<p>{% embed
+url=“https://www.youtube.com/watch?ab_channel=JoshHug&amp;v=jms0P6p6aQc”
+%} “I have another problem for you to solve ( ͡° ͜ʖ ͡°)…” - Josh Hug {%
+endembed %}</p>
+<p>Let us compare the <code>dup1</code> table with the <code>dup2</code>
+table:</p>
+<p><code>dup1</code> table:</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Symbolic Count</th>
+<th>Count (for N=10000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>1 to <span class="math display"><em>N</em></span></td>
+<td>1 (in the best case) to 10000 (in the worst case)</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>2 to <span
+class="math display">(<em>N</em>² + 3<em>N</em> + 2)/2</span></td>
+<td>2 to 50,015,001</td>
+</tr>
+<tr>
+<td>+= 1</td>
+<td>0 to <span
+class="math display">(<em>N</em>² + <em>N</em>)/2</span></td>
+<td>0 to 50,005,000</td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to <span
+class="math display">(<em>N</em>² − <em>N</em>)/2</span></td>
+<td>1 to 49,995,000</td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to <span class="math display"><em>N</em>² − <em>N</em></span></td>
+<td>2 to 99,990,000</td>
+</tr>
+</tbody>
+</table>
+<p><code>dup2</code> table:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Symbolic Count</th>
+<th>Count (for N=10000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>0 to <span class="math display"><em>N</em></span></td>
+<td>0 to 10,000</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>0 to <span class="math display"><em>N</em> − 1</span></td>
+<td>0 to 9,999</td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to <span class="math display"><em>N</em> − 1</span></td>
+<td>1 to 9,999</td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to <span class="math display">2<em>N</em> − 2</span></td>
+<td>2 to 19998</td>
+</tr>
+</tbody>
+</table>
+<p>We can see that <code>dup2</code> performs significantly better than
+<code>dup1</code> in the worst case! </p>
+<p>One way to rationalize this is that it takes fewer operations for
+<code>dup2</code> to accomplish the same goal as <code>dup1</code>. </p>
+<p>A better realization is that the algorithm for <code>dup2</code>
+scales much better in the worst case (e.g. (<span
+class="math display"><em>N</em>² + 3<em>N</em> + 2)/2</span> vs <span
+class="math display"><em>N</em></span>)</p>
+<p>An even <strong>better</strong> realization is that parabolas (<span
+class="math display"><em>N</em>²</span>) always grow faster than lines
+(<span class="math display"><em>N</em></span>).</p>
+<h1 id="asymptotic-behavior">11.4 Asymptotic Behavior</h1>
+<p>In most applications, we are most concerned about what happens for
+very large values of <span class="math display"><em>N</em></span>. This
+is known as the <em>asymptotic behavior</em>. We want to learn what
+types of algorithms are able to handle large amounts of data. Some
+examples of applications that require highly efficient algorithms
+are:</p>
+<ul>
+<li>Simulating the interactions of billions of particles</li>
+<li>Maintaining a social network with billions of users</li>
+<li>Encoding billions of bytes of video data</li>
+</ul>
+<p>Algorithms that scale well have better <em>asymptotic</em> runtime
+behavior than algorithms that scale poorly.</p>
+<p>{% embed
+url=“https://www.youtube.com/watch?ab_channel=JoshHug&amp;v=vxYADFsa3HU”
+%}</p>
+<p>Let us return to the original problem of characterizing the runtimes
+of our <code>dup</code> functions. Recall that we desire
+characterizations that have the following features:</p>
+<ul>
+<li>Simple and mathematically rigorous.</li>
+<li>Clearly demonstrate the superiority of dup2 over dup1.</li>
+</ul>
+<p>We’ve accomplished the second task! We are able to clearly see that
+<code>dup2</code> performed better than <code>dup1</code>. However, we
+didn’t do it in a very simple or mathematically rigorous way. Luckily,
+we can apply a series of simplifications to solve these issues.</p>
+<h3 id="simplification-1-consider-only-the-worst-case">Simplification 1:
+Consider Only the Worst Case</h3>
+<p>When comparing algorithms, we often only care about the worst case.
+The worst case is often where we see the most interesting effects, so we
+can usually ignore all other cases but the worst case. </p>
+<h4 id="example">Example:</h4>
+<p>Consider the operation counts of some algorithm below. What do you
+expect will be the order of growth of the runtime for the algorithm?</p>
+<ul>
+<li><span class="math display"><em>N</em></span> (linear)</li>
+<li><span class="math display"><em>N</em><sup>2</sup></span>
+(quadratic)</li>
+<li><span class="math display"><em>N</em><sup>3</sup></span>
+(cubic)</li>
+<li><span class="math display"><em>N</em><sup>6</sup></span>
+(sextic)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>less than (&lt;)</td>
+<td><span
+class="math display">100<em>N</em><sup>2</sup> + 3<em>N</em></span></td>
+</tr>
+<tr>
+<td>greater than (&gt;)</td>
+<td><span class="math display"><em>N</em><sup>3</sup> + 1</span></td>
+</tr>
+<tr>
+<td>and (&amp;&amp;)</td>
+<td><span class="math display">5000</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Answer:</strong> <span
+class="math display"><em>N</em><sup>3</sup></span> (cubic)</p>
+<p>Intuitively, <span class="math display"><em>N</em><sup>3</sup></span>
+grows faster than <span
+class="math display"><em>N</em><sup>2</sup></span>, so it would
+“dominate.” To help further convince you that this is the case, consider
+the following argument:</p>
+<ul>
+<li>Suppose the &lt; operator takes <span
+class="math display"><em>α</em></span> nanoseconds, the &gt; operator
+takes <span class="math display"><em>β</em></span> nanoseconds, and the
+&amp;&amp; takes <span class="math display"><em>γ</em></span>
+nanoseconds.</li>
+<li>The total time is <span
+class="math display"><em>α</em>(100<em>N</em><sup>2</sup> + 3) + <em>β</em>(2<em>N</em><sup>3</sup> + 1) + 5000<em>γ</em></span>
+nanoseconds.</li>
+<li>For very large <span class="math display"><em>N</em></span>, the
+<span class="math display">2<em>β</em><em>N</em><sup>3</sup></span> term
+is much larger than others.</li>
+<li>It can help to think of it in terms of calculus. What happens as
+<span class="math display"><em>N</em></span> approaches infinity? Which
+term ends up dominating?</li>
+</ul>
+<h3
+id="simplification-2-restrict-attention-to-one-operation">Simplification
+2: Restrict Attention to One Operation</h3>
+<p>Pick some representative operation to act as a proxy for overall
+runtime. From our <code>dup</code> example:</p>
+<ul>
+<li>Good choice: <code>increment</code>, or <strong>less than</strong>
+or <strong>equals</strong> or <strong>array accesses.</strong></li>
+<li>Bad choice: <strong>assignment of</strong> <code>j = i + 1</code>,
+or <code>i = 0.</code></li>
+</ul>
+<p>The operation we choose is called the “<strong>cost
+model</strong>.”</p>
+<h3 id="simplification-3-eliminate-low-order-terms">Simplification 3:
+Eliminate Low Order Terms</h3>
+<p>Ignore lower order terms.</p>
+<p><strong>Sanity check</strong>: Why does this make sense? (Related to
+the checkpoint above!)</p>
+<h3
+id="simplification-4-eliminate-multiplicative-constants"><strong>Simplification
+4: Eliminate Multiplicative Constants</strong></h3>
+<p>Ignore multiplicative constants.</p>
+<ul>
+<li>Why? No real meaning!</li>
+<li>By choosing a single representative operation, we already “threw
+away” some information.</li>
+<li>Some operations had counts of <span
+class="math display">3<em>N</em><sup>2</sup></span>, ​​<span
+class="math display"><em>N</em><sup>2</sup>/2</span>, etc. In general,
+they are all in the family/shape of <span
+class="math display"><em>N</em><sup>2</sup></span>.</li>
+</ul>
+<h3 id="checkpoint-exercise">Checkpoint Exercise:</h3>
+<p>Apply our four simplification rules to the <code>dup2</code> table.
+</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Symbolic Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i = 0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>j = i+1</td>
+<td>0 to <span class="math display"><em>N</em></span></td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>0 to <span class="math display"><em>N</em> − 1</span></td>
+</tr>
+<tr>
+<td>==</td>
+<td>1 to <span class="math display"><em>N</em> − 1</span></td>
+</tr>
+<tr>
+<td>array accesses</td>
+<td>2 to <span class="math display">2<em>N</em> − 2</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example answer</strong>: array accesses with order of growth
+<span class="math display"><em>N</em></span>.</p>
+<p>&lt;, ==, and j=i+1 would be fine answers as well.</p>
+<h3 id="simplification-summary">Simplification Summary</h3>
+<ul>
+<li>Only consider the worst case.</li>
+<li>Pick a representative operation (aka: cost model)</li>
+<li>Ignore lower order terms</li>
+<li>Ignore multiplicative constants.</li>
+</ul>
+<h1 id="simplified-analysis-process">11.5 Simplified Analysis
+Process</h1>
+<p><strong>Summary of our (Painful) Analysis Process</strong></p>
+<ul>
+<li>Construct a table of exact counts of all possible operations (takes
+lots of effort!)</li>
+<li>Convert table into worst case order of growth using 4
+simplifications.</li>
+</ul>
+<p>We will now propose an alternative method that avoids building a
+table altogether!</p>
+<p>{% embed
+url=“https://www.youtube.com/watch?v=lJ1A8Jyeba0&amp;ab_channel=JoshHug”
+%}</p>
+<p>Our simplified analysis process will consist of:</p>
+<ul>
+<li>Choosing our cost model, which is the representative operation we
+want to count.</li>
+<li>Figuring out the order of growth for the count of our representative
+operation by either:
+<ul>
+<li>Making an exact count and discarding unnecessary pieces or…</li>
+<li>Using intuition/inspection to determine orders of growth. This is
+something that comes with practice.</li>
+</ul></li>
+</ul>
+<h4 id="example-analysis-of-nested-for-loops---exact-counts">Example:
+Analysis of Nested For Loops - Exact Counts</h4>
+<p>Find the order of growth of the worst case runtime of
+<code>dup1</code>.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> N <span class="op">=</span> A<span class="op">.</span><span class="fu">length</span><span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;</span> N<span class="op">;</span> j <span class="op">+=</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>A<span class="op">[</span>i<span class="op">]</span> <span class="op">==</span> A<span class="op">[</span>j<span class="op">])</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span></code></pre></div>
+<p>We will choose our cost model to be the <em>number of ==
+operations</em>. </p>
+<p>Looking at the structure of the loops, the inner loop first gets run
+j=N-1 times. At the second iteration, i=1, so the inner loop runs an
+additional j=N-2 times. At the third iteration, i=2, so the inner loop
+runs an additional j=N-3 times. The total number of times the loop is
+run is thus:</p>
+<p><span
+class="math display">cost = 1 + 2 + 3 + … + (<em>N</em> − 2) + (<em>N</em> − 1)</span></p>
+<p>This cost can be simplified to <span
+class="math display">$$\frac{N(N-1)}{2}$$</span> (<a
+href="https://en.wikipedia.org/wiki/1_%2B_2_%2B_3_%2B_4_%2B_%E2%8B%AF">how?</a>).
+We can use simplification to throw away all lower order terms and
+constants to get the worst case order of growth <span
+class="math display"><em>N</em><sup>2</sup></span>.</p>
+<h4
+id="example-analysis-of-nested-for-loops---geometric-argument">Example:
+Analysis of Nested For Loops - Geometric Argument</h4>
+<ul>
+<li>We can see that the number of equals can be given by the area of a
+right triangle, which has a side length of <span
+class="math display"><em>N</em> − 1</span>.</li>
+<li>Therefore, the order of growth of area is <span
+class="math display"><em>N</em><sup>2</sup></span>.​​</li>
+<li>This is definitely not something that is immediately obvious. It
+takes time and practice to see these patterns!</li>
+</ul>
+<h1 id="summary">11.6 Summary</h1>
+<p>To summarize this chapter:</p>
+<ul>
+<li>Given a piece of code, we can express its runtime as a function
+<span class="math display"><em>R</em>(<em>N</em>)</span>
+<ul>
+<li><span class="math display"><em>N</em></span> is a
+<strong>property</strong> of the input of the function often
+representing the <strong>size</strong> of the input</li>
+</ul></li>
+<li>Rather than finding the exact value of <span
+class="math display"><em>R</em>(<em>N</em>)</span>, we only worry about
+finding the <strong>order of growth</strong> of <span
+class="math display"><em>R</em>(<em>N</em>)</span>.</li>
+<li>One approach (not universal):
+<ul>
+<li>Choose a representative operation</li>
+<li>Let <span class="math display"><em>C</em>(<em>N</em>)</span> be the
+count of how many times that operation occurs as a function of <span
+class="math display"><em>N</em></span>.</li>
+<li>Determine order of growth <span
+class="math display"><em>f</em>(<em>N</em>)</span> for <span
+class="math display"><em>C</em>(<em>N</em>)</span>, i.e. <span
+class="math display"><em>C</em>(<em>N</em>) ∈ <em>Θ</em>(<em>f</em>(<em>N</em>))</span></li>
+<li>Often (but not always) we consider the worst case count.</li>
+<li>If operation takes constant time, then <span
+class="math display"><em>R</em>(<em>N</em>) ∈ <em>Θ</em>(<em>f</em>(<em>N</em>))</span>.</li>
+</ul></li>
+</ul>
+<h1 id="exercises">11.7 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>Analyze the runtime of the following code in terms of
+<code>N</code>:</li>
+</ol>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>j <span class="op">&lt;</span> N<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> N<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<ol start="2" type="1">
+<li>Let <span
+class="math display"><em>f</em>(<em>N</em>) = 2<em>N</em></span>. Which
+of the following statements is true?
+<ul class="task-list">
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(1)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em>)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em><sup>2</sup>)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(1)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em>)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em><sup>2</sup>)</span></label></li>
+</ul></li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Note that the inner loop only runs once, since it immediately sets
+<code>j = N</code> in the first iteration. As such, the runtime is just
+the runtime of the outer loop, which iterates <code>N</code> times. The
+overall runtime, then, is linear.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>Remember that <span class="math display"><em>Θ</em></span> means the
+same order of growth (linear), while <span
+class="math display"><em>O</em></span> can be roughly thought of as
+“less than or equal to” some order of growth.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(1)</span></label></li>
+<li><label><input type="checkbox" checked="" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em>)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em><sup>2</sup>)</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(1)</span></label></li>
+<li><label><input type="checkbox" checked="" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em>)</span></label></li>
+<li><label><input type="checkbox" checked="" /><span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>O</em>(<em>N</em><sup>2</sup>)</span></label></li>
+</ul>
+</details>
+<h2 id="procedural">Procedural</h2>
+<ol type="1">
+<li><strong>True or false.</strong> Suppose we have a function <span
+class="math display"><em>f</em></span>, and we are told <span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em><sup>2</sup>)</span>.
+If we run <span class="math display"><em>f</em></span>on an input of
+size <span class="math display"><em>N</em></span>, then an input of size
+<span class="math display">2<em>N</em></span>, it will take roughly 4
+times as long.</li>
+<li><strong>True or false.</strong> Suppose we have a function <span
+class="math display"><em>f</em></span>, and we are told <span
+class="math display"><em>f</em>(<em>N</em>) ∈ <em>Θ</em>(<em>N</em><sup>2</sup>)</span>.
+If we run <span class="math display"><em>f</em></span>on an input of
+size 100, then an input of size 200, it will take roughly 4 times as
+long.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p><strong>True</strong>. This is the definition of asymptotics.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><strong>False</strong>. 100 may be too small of an input for
+asymptotic behavior to start displaying. Remember that asymptotics only
+apply to very large inputs!</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Why do use asymptotics instead of empirical timing (for example,
+like the <code>Stopwatch</code> class from Lab 3)?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>There are several advantages to using asymptotics over empirical
+timing. See if you can come up with more beyond the list below!</p>
+<ul>
+<li>Different computers run at different speeds. Depending on
+architecture, hardware components, even room temperature, the same code
+can execute with vastly different empirical times.</li>
+<li>It may not be feasible to test code on extremely large inputs. </li>
+<li>Asymptotics are language-agnostic. The same algorithm may have
+different empirical runtime depending on which language it’s written in
+(for example, C is usually around 10-400x faster than Python), but will
+have the same asymptotic runtime.</li>
+<li>The worst-case runtime may only occur in certain cases that are hard
+to measure empirically. </li>
+</ul>
+</details>
+<h1 id="asymptotics-i">11. Asymptotics I</h1>
