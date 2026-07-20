@@ -125,7 +125,7 @@
   * [24.4 Handling Collisions: Linear Probing and External Chaining](24.-hashing-i/24.4-handling-collisions-linear-probing-and-external-chaining.md)
   * [24.5 Resizing & Hash Table Performance](24.-hashing-i/24.5-resizing-and-hash-table-performance.md)
   * [24.6 Summary](24.-hashing-i/24.6-summary.md)
-  * [24.7 Exercises](24.-hashing-i/20.7-exercises.md)
+  * [24.7 Exercises](24.-hashing-i/24.7-exercises.md)
 * [25. Hashing II](25.-hashing-ii/README.md)
   * [25.1 Hash Table Recap, Default Hash Function](25.-hashing-ii/25.1-hash-table-recap-default-hash-function.md)
   * [25.2 Distribution By Other Hash Functions](25.-hashing-ii/25.2-distribution-by-other-hash-functions.md)
@@ -209,8 +209,3 @@
   * [38.3 Space/Time-Bounded Compression](38.-compression-complexity-p-np/38.3-space-time-bounded-compression.md)
   * [38.4 P = NP](38.-compression-complexity-p-np/38.4-p-np.md)
   * [38.5 Exercises](38.-compression-complexity-p-np/38.5-exercises.md)
-<!--
-* [5. DLLists](5.-dllists.md)
-* [6. Arrays](6.-arrays.md)
-* [7. Testing](7.-testing.md)
--->
