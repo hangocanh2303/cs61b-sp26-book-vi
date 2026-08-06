@@ -1,0 +1,310 @@
+<h1 id="partitioning">30.1 Partitioning</h1>
+<p>Previously, we’ve covered <strong>selection sort, heap sort, merge
+sort, and insertion sort</strong>.</p>
+<p>These sorts each have a basic idea powering them: </p>
+<ul>
+<li>Selection sort: find the smallest item, put it at the front</li>
+<li>Heap sort: use MaxPQ to find the maximum element, put it at the
+front</li>
+<li>Merge sort: merge two sorted halves into one sorted whole </li>
+<li>Insertion sort: determine where to insert the current item</li>
+</ul>
+<p>The core idea behind Quicksort involves
+<strong>partitioning.</strong> </p>
+<p>Specifically, to partition an array a[], first pick an element x =
+a[i] as the pivot. </p>
+<!--<figure><img src="https://lh6.googleusercontent.com/uFsnl6huFGAYsN7Tsk4-0F3mBDUDZ9Cobaeq3cWeDs4kWvE3d2-4Zyp3QLzNxuUipSOMJvSUmTlQWqpnasgMNkBqv6s4Cu-ndfIv-tkLJ8QhjibVJYwTEBmOQM6utO8z8M8S58wvuxMgiedvLqcllFY" alt=""><figcaption><p>In this array, x = 10 and is the pivot element. This array has not be partitioned on x = 10 yet. </p></figcaption></figure> -->
+<p>Partitioning on that pivot element (x) involves rearrange a[] such
+that: </p>
+<ol type="1">
+<li>x moves to some position j (can be the original position of i)</li>
+<li>All array elements to the left of x are less than or equal to x
+(&lt;= x) </li>
+<li>All array elements to the right of x are greater than or equal to x
+(&gt;= x)</li>
+</ol>
+<!--In the following arrays, A, B, and C represent arrays that are valid partitions (with the pivot being x = 10), while D represents an invalid partition.-->
+<!--<figure><img src="https://lh5.googleusercontent.com/SFSKi0Tx5zqOkkBagtljRD__IHEeIoGzOa3jipkmRt_lxYZKFh5mqEMOsLjy1LvSzgA4wXW5qHvMfx7im3vhw6fD-er0XTA9cc-fTmASeB1oeYksBPVaGFRkIt0JLjorRdsG8TDWguvHDad9NM4MTRg" alt=""><figcaption><p>D is an invalid partition because 4 is less than 10, but is to the right of the pivot after the partition. </p></figcaption></figure>-->
+<h1 id="quicksort-algorithm">30.2 Quicksort Algorithm</h1>
+<p>The figure below shows a partition performed on the pivot of 5.
+Notice how 5 in its “proper place” (in other words, it’s exactly where
+it should be if the entire array was sorted).</p>
+<p>This suggests that the partition procedure can be used recursively on
+the two halves to the left and to the right of the pivot element. </p>
+<!--<figure><img src="https://lh6.googleusercontent.com/ZMiWPSUmOc95h-fBaxMB4I42Djyk0uAL_s8J9XwwqW4KHizpn1xf0wuwciRKa033jyMKK78Vul99b1xYa_fLUOVYFnFhLNZDZstdWSLv-M6Z84H_QD2YOmHeJGjsPOaxIlGWojDANKOPLZ3tVORvZQQ" alt=""><figcaption><p>After partitioning on the pivot element of 5, 5 is in the “proper place” and there are two halves left to be sorted. The left half are the four elements of [3, 2, 1, 4], and the right half consists of the three elements of [7, 8, 6]. </p></figcaption></figure>-->
+<p>The properties that partitioning provides inspires Tony Hoare’s
+Quicksort algorithm. </p>
+<p><strong>Quicksort Algorithm</strong> </p>
+<p>To quicksort N items: </p>
+<ol type="1">
+<li>Partition on the leftmost item as the pivot. </li>
+<li>Recursively quicksort the left half. </li>
+<li>Recursively quicksort the right half. </li>
+</ol>
+<p><a href="https://joshh.ug/61b/sorts/hoare_partition/index.html">Look
+at the following website for an illustration of Hoare’s Quicksort
+algorithm</a>
+<!--<figure><img src="https://lh6.googleusercontent.com/srbltrmdQThh9xwjjq-smTXOAVhav1ISWHf4eKX2yZlHr50kHlvZDmH36nNMwLWuMkOlzyApaJWvUdEA1ydHDYKbulYtVuqU6kOn9QbMWAraIOcQae7ymka3zCJKcgzd0u9SeubYP7as_PnnRnEU6Ak" alt=""><figcaption><p><a href="https://docs.google.com/presentation/d/1QjAs-zx1i0_XWlLqsKtexb-iueao9jNLkN-gW9QxAD0/edit?usp=sharing">Demo of quicksort is linked here</a></p></figcaption></figure>--></p>
+<h1 id="quicksort-performance-caveats">30.3 Quicksort Performance
+Caveats</h1>
+<p>“Quicksort” was chosen by Tony Hoare as the name for this particular
+partition sort algorithm. Coincidentally, quicksort is empirically the
+fastest sort for most common situations. </p>
+<p>How fast is Quicksort exactly? To answer this question, we need to
+count the number and calculate the difficulty of the partition
+operations employed in Quicksort. </p>
+<p>In the theoretical runtime analysis, partitioning costs <span
+class="math display"><em>Θ</em>(<em>K</em>)</span> time, where <span
+class="math display"><em>Θ</em>(<em>K</em>)</span> is the number of
+elements being partitioned.</p>
+<p>However, what complicates runtime analysis for Quicksort is that the
+the overall runtime will depend on where the pivot ends up. </p>
+<h4 id="best-case">Best Case</h4>
+<p>For instance, the best case runtime is when the pivot chosen always
+lands in the middle (in other words, the partition always picks the
+median element of the array). </p>
+<!--<figure><img src="https://lh3.googleusercontent.com/aPwCJk-kd_yMuLoWOEFGoOv-KL3CLHjIkhjF3jkIzzDDP-Km5ZMKweibs7zjVU3IrZ1TjYA_vaIr8AnBGL0NaX_0W8sKWKjd75knjSruW2wnradN9lrXBYNbbmJyCRo6992xcUhkcQhd4QJekQ9m27k" alt=""><figcaption><p>Best Case</p></figcaption></figure>-->
+<p>In the best case, the total work done at each level is approximately
+O(N). To see this, the first partition pivots on one element and
+requires checking all N elements to determine whether they go on the
+right or the left of the pivot element. The second layer repeats this,
+but for N/2 elements on two separate pivots (since we are recursively
+partitioning on the two halves). Thus, each level is O(N) work. </p>
+<p>The overall runtime becomes <span
+class="math display"><em>Θ</em>(<em>N</em><em>H</em>)</span>, where H =
+# of layers = <span
+class="math display"><em>Θ</em>(<em>l</em><em>o</em><em>g</em><em>N</em>)</span>.
+Thus, the total runtime for Quicksort in the best case is <span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span>.</p>
+<h4 id="worst-case">Worst Case</h4>
+<p>The worst case for runtime occurs when the pivot chosen at each
+partition lands at the beginning of the array. In this scenario, each
+layer still has to do O(N) work, but now there are H = # of layers = N
+layers, since every single element has to be pivoted on. Thus, the worst
+case runtime is <span
+class="math display"><em>Θ</em>(<em>N</em><sup>2</sup>)</span>.</p>
+<!--<figure><img src="https://lh6.googleusercontent.com/EDrTj7V1EJuK4gzbemhYfMvvjgEfJcqvdlw3EeM7d5Et1yacIXCPMQud1G45Igotd2sG-GRxVb9DAK7XMeMcoZD0D1fvxhKaZBFTXe7UY_V9GT2VY367PoD8QjZic7abc7iVFtdL1ZPev45Tm2SO1Yo" alt=""><figcaption><p>Worst Case: <span class="math">\Theta(N^2)</span></p></figcaption></figure>-->
+<h4 id="quicksort-vs-mergesort-performance">Quicksort vs Mergesort
+Performance</h4>
+<table>
+<thead>
+<tr>
+<th>Theoretical Analysis</th>
+<th>Quicksort</th>
+<th>Mergesort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Best Case</td>
+<td><span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+</tr>
+<tr>
+<td>Worst Case</td>
+<td><span
+class="math display"><em>Θ</em>(<em>N</em><sup>2</sup>)</span></td>
+<td><span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span></td>
+</tr>
+</tbody>
+</table>
+<p>In comparison, Mergesort seems to be a lot better, since Quicksort
+suffers from a theoretical worst case runtime of <span
+class="math display"><em>Θ</em>(<em>N</em><sup>2</sup>)</span>. So how
+can Quicksort be the fastest sort empirically? Quicksort’s advantage
+empirically comes from the fact that on average, Quicksort is <span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span>.</p>
+<h4 id="quicksorts-performance-argument-1-10-case">Quicksort’s
+Performance Argument #1: 10% Case</h4>
+<p>One argument for why Quicksort is the fastest sort empirically
+supposes that the pivot always ends up at least 10% from either edge.
+</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-03-31 at 11.40.20 PM.png" alt="">
+<figcaption>
+<p>
+Pivot is ~10% from the left edge.
+</p>
+</figcaption>
+</figure>
+<p>If this is the case, then the runtime is still O(NH), where O(N) is
+the work at each level and H is the # of levels. Since the pivot always
+lands at least 10% from either edge, H is approximately <span
+class="math display">log<sub>10/9</sub><em>N</em></span>= O(log N).
+Thus, overall runtime is O(N log N).</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-03-31 at 11.45.27 PM.png" alt="">
+<figcaption>
+<p>
+10% case partition work at each level.
+</p>
+</figcaption>
+</figure>
+<p>In other words, even if you are not lucky enough to have a pivot that
+is near the middle, if you can at least have a pivot that is always 10%
+from the edge, the runtime will be O(N log N). </p>
+<h4
+id="quicksorts-performance-argument-2-quicksort-is-bst-sort">Quicksort’s
+Performance Argument #2: Quicksort is BST Sort</h4>
+<p>From another lens, Quicksort can be seen as a form of BST sort. This
+is because the compareTo calls that Quicksort employs between each
+element and the pivot element in each partition is the same as the
+compareTo calls performed in BST insert. </p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-03-31 at 11.48.25 PM.png" alt="">
+<figcaption>
+<p>
+BST insert
+</p>
+</figcaption>
+</figure>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-03-31 at 11.49.08 PM.png" alt="">
+<figcaption>
+<p>
+Quicksort partitions on the “same” BST elements as above.
+</p>
+</figcaption>
+</figure>
+<p>Since random insertion into a BST takes O(N log N) time, Quicksort
+can be argued to have similar performance. </p>
+<h4 id="empirical-quicksort-runtime">Empirical Quicksort Runtime</h4>
+<p>Empirically, for N items, Quicksort uses an average of ~2N ln N
+compares to complete (across 10,000 trials with N = 1000). For more
+information, <a
+href="http://www.informit.com/articles/article.aspx?p=2017754&amp;seqNum=7">check
+out this link</a>.</p>
+<h4 id="avoiding-the-worst-case-of-quicksort">Avoiding the Worst Case of
+Quicksort</h4>
+<p>As you can see from above, the performance of Quicksort (both in
+terms of order of growth and in constant factors) depends critically
+upon <strong>how you select the pivot, how you partition around the
+pivot, and other optimizations that you can add to speed things
+up.</strong> </p>
+<p>Given certain conditions, Quicksort can result in <span
+class="math display"><em>Θ</em>(<em>N</em><sup>2</sup>)</span>, which is
+much worse than <span
+class="math display"><em>Θ</em>(<em>N</em><em>l</em><em>o</em><em>g</em><em>N</em>)</span>.
+Some of these conditions include <strong>bad ordering,</strong> where
+the array is already in sorted order (or almost sorted order), and
+<strong>bad elements,</strong> where the array has all duplicates. </p>
+<h1 id="summary">30.4 Summary</h1>
+<p><strong>Insertion Sort Sweet Spots.</strong> We concluded our
+discussion of insertion sort by observing that insertion sort is very
+fast for arrays that are almost sorted, i.e. that have Θ(N) inversions.
+It is also fastest for small N (roughly N≤15).</p>
+<p><strong>Partitioning.</strong> Partioning an array on a pivot means
+to rearrange the array such that all items to the left of the pivot are
+≤ the pivot, and all items to the right are ≥ the pivot. Naturally, the
+pivot can move during this process.</p>
+<p><strong>Partitioning Strategies.</strong> There are many particular
+strategies for partitioning. You <em>are</em> expected to know how
+Quicksort partioning works.</p>
+<p><strong>Quicksort.</strong> Partition on some pivot. Quicksort to the
+left of the pivot. Quicksort to the right.</p>
+<p><strong>Quicksort Runtime.</strong> Understand how to show that in
+the best case, Quicksort has runtime Θ(Nlog⁡N), and in the worse case has
+runtime <span
+class="math display"><em>Θ</em>(<em>N</em><sup>2</sup>)</span>.</p>
+<p><strong>Pivot Selection.</strong> Choice of partitioning strategy and
+pivot have profound impacts on runtime. Two pivot selection strategies
+that we discussed: Use leftmost item and pick a random pivot. Understand
+how using leftmost item can lead to bad performance on real data.</p>
+<p><strong>Randomization.</strong> Accept (without proof) that Quicksort
+has on average Θ(Nlog⁡N) runtime. Picking a random pivot or shuffling an
+array before sorting (using an appropriate partitioning strategy)
+ensures that we’re in the average case.</p>
+<p><strong>Quicksort properties.</strong> For most real world
+situations, quicksort is the fastest sort.</p>
+<h1 id="exercises">30.5 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>Suppose we have a sorted array in Java. What is the best approach
+for finding a particular item in the array: binary search or linear
+iteration?</li>
+<li>Repeat the above exercise for a sorted array stored on physical
+tape.</li>
+<li>Given the array <code>[90, 50, 20, 30, 40, 10, 60, 50, 30]</code>,
+what would be the best pivot?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Binary search. Binary search would take <span
+class="math display">log <em>N</em></span> time, where <span
+class="math display"><em>N</em></span> is the length of the array.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>On a physical tape, the runtime of the algorithm will be dominated by
+the time to accelerate the physical piece of tape. In the worst case,
+binary search would involve scanning to the middle of the tape, then a
+quarter of the way back, then an 1/8th of the way forward, and so forth.
+In the worst case, we have to cover N/2 + N/4 + N/8 + … + 1 or O(N)
+spaces on the tape. However, all that acceleration back and forth will
+result in an algorithm that is almost certainly slower in the worst case
+than just scanning forwards.</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>40; it is the median which will evenly partition the array.</p>
+</details>
+<h2 id="procedural">Procedural</h2>
+<ol type="1">
+<li>If we have 10 items to sort, how many compares will it take to
+selection sort all of the items?</li>
+<li>What is the depth of the quicksort recursive tree in the best and
+worst case? Give an exact answer, not a theta bound.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>45 total; first we do 9 compares to find the smallest item, then 8,
+then 7, etc. 1 + 2 + 3 + … 9 = 45.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>In the worst case, we make <span
+class="math display"><em>N</em></span> recursive calls if we always
+choose the smallest or largest item as our pivot. Thus, the recursive
+tree has depth <span class="math display"><em>N</em></span>.</p>
+<p>In the best case, we always choose the median as our pivot. This
+halves the size of the array at each level, resulting in <span
+class="math display">log<sub>2</sub><em>N</em></span> levels.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Assume that we always pick the leftmost item as our pivot for
+quicksort. Identify the three types of arrays that will cause a
+worst-case runtime. For partitioning, assume that we partition into two
+arrays: items less than or equal to the pivot, and items greater than
+the pivot.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>The two types of arrays are:</p>
+<ol type="1">
+<li>Arrays already in sorted order. There will always be nothing to the
+left of the pivot, since the pivot will always be the smallest
+item.</li>
+<li>Arrays in reverse-sorted order. This has the same problem as (1),
+except that the pivot will always be the largest item. </li>
+<li>Arrays where all items are equal. Everything will be partitioned
+into the left (less than or equal to array), and nothing in the
+greater-than array.</li>
+</ol>
+</details>
+<h1 id="quicksort">30. Quicksort</h1>

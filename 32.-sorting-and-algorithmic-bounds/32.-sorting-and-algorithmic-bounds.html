@@ -1,0 +1,453 @@
+<h1 id="sorting-summary">32.1 Sorting Summary</h1>
+<h2 id="other-desirable-sorting-properties-stability">Other Desirable
+Sorting Properties: Stability</h2>
+<h4
+id="a-sort-is-said-to-be-stable-if-order-of-equivalent-items-is-preserved.">A
+sort is said to be stable if order of equivalent items is
+preserved.</h4>
+<figure>
+<img src="../.gitbook/assets/image (85).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>Equivalent items don’t ‘cross over’ when being stably sorted.</p>
+<p>On the other hand…</p>
+<figure>
+<img src="../.gitbook/assets/image (138).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>Sorting instability can be really annoying! Wanted students listed
+alphabetically by section.</p>
+<p><br />
+Arrays.sort() ————-</p>
+<p>In Java, Arrays.sort(someArray) uses:</p>
+<ul>
+<li>Mergesort (specifically the TimSort variant) if someArray consists
+of Objects.</li>
+<li>Quicksort if someArray consists of primitives.</li>
+</ul>
+<figure>
+<img src="https://lh3.googleusercontent.com/PDj3CTwryGwH-zcuR27Eu4VE0vxyJLiRVCAWuaCVrhbO51Cihnnsi6Zb3RGnMNPd0MJdvmAjdeD-8-r_emyVXqkKrxsN6cku7kD2eb_s7sRqpchoO4-FPPP_d2J0XpGF_5NZZHRnnMiJQaGZ_krE_6cOPQ=s2048" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<figure>
+<img src="https://lh4.googleusercontent.com/ouERSw5xhhN_7adslpMp58k5wTeOr8xt2r0ZdeQJnYOD6d43plwpVWaHvyqsCXizBkRrIg6y-CZOCYaVfzbpcAtPsLTU23V4ldc9EbI2sq1Lc9US33BmqpZuVeeZbRyB8WPuLTzSkDsQhSBxY2gpo0c0yg=s2048" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<details>
+<summary>
+Why?
+</summary>
+<ul>
+<li>Quicksort isn’t stable, but there’s only one way to order them.
+Wouldn’t have multiple types of orders.</li>
+<li>Could sort by other things, say the sum of the digits. </li>
+<li>Order by the number of digits.</li>
+<li>My usual answer: 5 is just 5. There are no different possible
+5’s.</li>
+<li>When you are using a primitive value, they are the ‘same’. A 4 is a
+4. Unstable sort has no observable effect.</li>
+<li>There’s really only one natural order for numbers, so why not just
+assume that’s the case and sort them that way. </li>
+<li>By contrast, objects can have many properties, e.g. section and
+name, so equivalent items CAN be differentiated.</li>
+<li>If you know there’s only one way, can you force Java to use
+Quicksort? </li>
+</ul>
+</details>
+<h2 id="sorting">Sorting</h2>
+<p>Sorting is a foundational problem.</p>
+<ul>
+<li>Obviously useful for putting things in order.</li>
+<li>But can also be used to solve other tasks, sometimes in non-trivial
+ways.
+<ul>
+<li>Sorting improves duplicate findings from a naive N^2 to N log
+N.</li>
+<li>Sorting improves 3SUM from a naive N^3 to N^2.</li>
+</ul></li>
+<li>There are many ways to sort an array, each with its own interesting
+tradeoffs and algorithmic features.</li>
+</ul>
+<p>Today we’ll discuss the fundamental nature of the sorting problem
+itself: How hard is it to sort?</p>
+<h2 id="sorts-summary">Sorts Summary</h2>
+<figure>
+<img src="../.gitbook/assets/screenshot 2023-04-14 at 1.43.52 AM.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p><br />
+</p>
+<h1 id="math-problems-out-of-nowhere">32.2 Math Problems Out of
+Nowhere</h1>
+<h2 id="a-math-problem">A Math Problem</h2>
+<details>
+<summary>
+Is <span class="math">N!(()^)</span>Prove your answer. [Recall that ∈ Ω
+can be informally be interpreted to mean &gt;=. In other words, does
+factorial grow at least as quickly as <span class="math">()^</span>?
+</summary>
+<p>10!</p>
+<ul>
+<li>10 * 9 * 8 * 7 * 6 * … * 1</li>
+</ul>
+<p><span class="math display">5<sup>5</sup></span></p>
+<ul>
+<li>5 * 5 * 5 * 5 * 5</li>
+</ul>
+<p><span class="math display">$$N!&gt;(\frac{N}{2})^\frac{N}{2}$$</span>
+for large N, therefore <span class="math display">$$N!\in
+\Omega((\frac{N}{2})^\frac{N}{2})$$</span></p>
+</details>
+<h2 id="another-math-problem">Another Math Problem</h2>
+<details>
+<summary>
+Given: <span class="math">N!&gt;()^</span>, which we used to prove our
+answer to the previous problem. Show that <span class="math">log(N!) (N
+* logN)</span>. [Recall: log means an unspecified base]
+</summary>
+<p>We have that <span
+class="math display">$$N!&gt;(\frac{N}{2})^\frac{N}{2}$$</span></p>
+<ul>
+<li>Taking the log of both sides, we have that <span
+class="math display">$$log(N!)&gt;log((\frac{N}{2})^\frac{N}{2})$$</span>.</li>
+<li>Bringing down the exponent we have that <span
+class="math display">$$log(N!)&gt;\frac{N}{2}*log((\frac{N}{2}))$$</span>.</li>
+<li>Discarding the unnecessary constant, we have <span
+class="math display">$$log(N!)&gt;\Omega(N*log(\frac{N}{2}))$$</span>.</li>
+<li>From there, we have that <span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>!) &gt; <em>Ω</em>(<em>N</em> * <em>l</em><em>o</em><em>g</em>(<em>N</em>))</span>.
+[since <span class="math display">$$log(\frac{N}{2})$$</span> is the
+same thing asymptotically as <span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>)</span>]</li>
+</ul>
+<p>In other words, <span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>!)</span>
+grows at least as quickly as <span
+class="math display"><em>N</em> * <em>l</em><em>o</em><em>g</em>(<em>N</em>)</span>.</p>
+</details>
+<h2 id="last-math-problem">Last Math Problem</h2>
+<details>
+<summary>
+In the previous problem, we showed that <span class="math">log(N!) (N *
+logN)</span>. Now show that <span class="math">N*logN (log(N!))</span>.
+</summary>
+<p>Proof:</p>
+<ul>
+<li><span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>!) = <em>l</em><em>o</em><em>g</em>(<em>N</em>) + <em>l</em><em>o</em><em>g</em>(<em>N</em> − 1) + ... + <em>l</em><em>o</em><em>g</em>(1)</span></li>
+<li><span
+class="math display"><em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em> = <em>l</em><em>o</em><em>g</em>(<em>N</em>) + <em>l</em><em>o</em><em>g</em>(<em>N</em>) + ... + <em>l</em><em>o</em><em>g</em>(<em>N</em>)</span></li>
+<li>Therefore <span
+class="math display"><em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em> ∈ <em>Ω</em>(<em>l</em><em>o</em><em>g</em>(<em>N</em>!))</span></li>
+</ul>
+</details>
+<h2 id="omega-and-theta">Omega and Theta</h2>
+<details>
+<summary>
+Given <span class="math">N<em>logN (log(N!))</span> and <span
+class="math">log(N!) (N * logN)</span>. Which of the following can we
+say?<br><br>A. <span class="math">N</em>logN (log(N!))</span><br>B.
+<span class="math">log(N!) (N * logN)</span><br>C. Both A and B<br>D.
+Neither
+</summary>
+<p>Answer: C. Both A and B</p>
+</details>
+<h2 id="summary">Summary</h2>
+<p>We’ve shown that <span
+class="math display"><em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em> ∈ <em>Θ</em>(<em>l</em><em>o</em><em>g</em>(<em>N</em>!))</span>.</p>
+<ul>
+<li>In other words, these two functions grow at the same rate
+asymptotically. </li>
+</ul>
+<p>As for why we did this, we will see in a little while…</p>
+<h1 id="theoretical-bounds-on-sorting">32.3 Theoretical Bounds on
+Sorting</h1>
+<p>So far, the fastest sorts we have gone over have had <span
+class="math display"><em>Θ</em>(<em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em>)</span>as
+the worse case time. This begs the question; can we get a sorting
+algorithm that would have a better asymptotic analysis? </p>
+<p>Let’s say that we have “the algorithm ultimate comparison sort” known
+as TUCS which is the fastest possible comparison sort. We don’t know the
+details of this yet-to-be-discovered algorithm as it has not been
+discovered yet. Let’s additionally say that <span
+class="math display"><em>R</em>(<em>N</em>)</span>is the worst-case
+runtime of TUCS and give ourselves the challenge of finding the best
+<span class="math display"><em>Θ</em></span> and <span
+class="math display"><em>O</em></span> bounds for <span
+class="math display"><em>R</em>(<em>N</em>)</span>. (This might seem a
+little odd since we really don’t know the details of it, but we can find
+<span class="math display"><em>R</em>(<em>N</em>)</span>).</p>
+<p>As a starting point, we can go ahead and have the <span
+class="math display"><em>O</em></span> bound of <span
+class="math display"><em>R</em>(<em>N</em>)</span> be <span
+class="math display"><em>O</em>(<em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em>)</span>.
+Why? If this is the fastest sorting algorithm it must be at least just
+as good as the algorithms we already have! Thus it must at least be as
+good as Mergesort’s worst case as otherwise we would have a
+contradiction in calling this algorithm TUCS. </p>
+<p>What about the starting point for the <span
+class="math display"><em>Ω</em></span> bound of <span
+class="math display"><em>R</em>(<em>N</em>)</span>? Since we don’t quite
+know any details about it we can start by giving it the best possible
+runtime of <span class="math display"><em>Ω</em>(1)</span>. But can we
+make this tighter? </p>
+<p><img src="../.gitbook/assets/image%20(108).png" /><br />
+<br />
+It turns out we can as if the algorithm sorts all of N elements, it must
+have gone through all of the N elements at some point of sorting it.
+Thus, we can arrive at a tighter bound of <span
+class="math display"><em>Ω</em>(<em>N</em>)</span>. But can we make it
+tighter? The answer is yes, but to see the argument for why we have to
+consider the following game. </p>
+<p><img src="../.gitbook/assets/image%20(135).png" /></p>
+<h3 id="a-game-of-cat-and-mouse-and-dog">A Game of Cat and Mouse (and
+Dog)</h3>
+<p>Let’s say we place Tom the Cat, Jerry the Mouse, and Spike the Dog in
+opaque soundproof boxes labeled A, B, and C. We want to figure out which
+is which using a scale.</p>
+<p><img
+src="https://lh3.googleusercontent.com/KkM-v6NCPT33GePoBDJ9JgLyKPtfEMPlIU9H0prq3-AX2qTd4_BiKjCw4BCZ82Q1zTeaGPcJK15w2neC5PVAI2EAQjFBdj4bV7qZTz-uPUOg6o9IvyOsSFuu4AfEQFnAAKpc1eU4DIbMjWZUY5ZIMhHA8Q=s2048" /></p>
+<p>Let’s say we knew that Box A weighs less than Box B, and that Box B
+weighs less than Box C. Could we tell which is which? </p>
+<p>The answer turns out to be yes! </p>
+<figure>
+<img src="../.gitbook/assets/image (101).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>We can find a sorted order by just considering these two
+inequalities. What if Box A weighs more than Box B, and that Box B
+weighs more than Box C? Could we still find out which is which?</p>
+<figure>
+<img src="../.gitbook/assets/image (100).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>The answer turns out to be yes! So far, we have been able to solve
+this game with just two inequalities! Let’s go ahead and try a third
+case scenario. Could we know which is which if Box A weighs less than
+Box B, but Box B weighs more than Box C?</p>
+<figure>
+<img src="../.gitbook/assets/image (92).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>The answer turns out to be no. It turns out to have two possible
+orderings:</p>
+<ul>
+<li>a: mouse, c: cat, b: dog (sorted order: acb)</li>
+<li>c: mouse, a: cat, b: dog (sorted order: cab)</li>
+</ul>
+<p>So while we were on a really great streak of solving the game with
+only two inequalities, we will need a third to solve all possibilities
+of the game. If we add the inequality a &lt; c then this problem goes
+away and becomes solvable. </p>
+<figure>
+<img src="../.gitbook/assets/image (151).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>Now that we’ve created this table, we can create a tree to help us
+solve this sorting game of cat and mouse (and dog).</p>
+<figure>
+<img src="../.gitbook/assets/image (158).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>But how can we make this generalizable for all sorting? We know that
+each leaf in this tree is a unique possible answer to how boxes should
+be sorted. So the number of ways the boxes can be sorted should turn out
+to be the number of leaves in the tree. That then begs the question of
+how many ways can N boxes be sorted? The answer turns out to be <span
+class="math display"><em>N</em>!</span> ways as there are <span
+class="math display"><em>N</em>!</span> permutations of a given set of
+elements.</p>
+<p>So how many questions do we need to ask in order to know how to sort
+the boxes? We would need to find the number of levels we must go through
+to get our answer in the leaf. Since it’s a binary tree the minimum
+amount levels turn out <span
+class="math display"><em>l</em><em>g</em>(<em>N</em>!)</span>levels to
+reach a leaf. (Note that <span
+class="math display"><em>l</em><em>g</em></span> means (log base
+2)).</p>
+<p>So, using this game we have found that we must ask at least <span
+class="math display"><em>l</em><em>g</em>(<em>N</em>!)</span> questions
+about inequalities to find a proper way to sort it. Thus our lower bound
+for <span class="math display"><em>R</em>(<em>N</em>)</span> is <span
+class="math display"><em>Ω</em>(<em>l</em><em>g</em>(<em>N</em>!))</span>.</p>
+<h1 id="summary-1">32.4 Summary</h1>
+<p><strong>Math Problem Out of Nowhere 1.</strong> We showed that <span
+class="math display">$$N! \in
+\Omega(\frac{N}{2}^{\frac{N}{2}})$$</span>.</p>
+<p><strong>Math Problem Out of Nowhere 2.</strong> We showed that <span
+class="math display">log (<em>N</em>!) ∈ <em>Ω</em>(<em>N</em>log <em>N</em>)</span>,
+and that <span
+class="math display"><em>N</em>log <em>N</em> ∈ <em>Ω</em>(log (<em>N</em>!))</span>.
+Therefore <span
+class="math display">log (<em>N</em>!) ∈ <em>Θ</em>(<em>N</em>log <em>N</em>)</span>.</p>
+<p><strong>Seeking a Sorting Lower Bound.</strong> We’ve found a number
+of sorts that complete execution in <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span> time.
+This raises the obvious question: Could we do better? Let TUCS (which
+stands for “The Ultimate Comparison Sort”) be the best possible
+algorithm that compares items and puts them in order. We know that
+TUCS’s worst case runtime is <span
+class="math display"><em>O</em>(<em>N</em>log <em>N</em>)</span> because
+we already know several algorithm whose worst case runtime is <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>, and
+TUCS’s worst case runtime is <span
+class="math display"><em>Ω</em>(<em>N</em>)</span> because we have to at
+least look at every item. Without further discussion, this analysis so
+far suggest that might be able to do better than <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span> worst
+case time.</p>
+<p><strong>Establishing a Sorting Lower Bound.</strong> As a fanciful
+exercise, we played a game called puppy-cat-dog, in which we have to
+identify which of three boxes contains a puppy, cat, or dog. Since there
+are 3! = 6 permutations, we need at least <span
+class="math display"><em>c</em><em>e</em><em>i</em><em>l</em>(lg (6)) = 3</span>
+questions to resolve the answer. In other words, if playing a game of 20
+questions with 6 possible answers, we have to ask at least 3 questions
+to be sure we have the right answer. Since sorting through comparisons
+is one way to solve puppy-cat-dog, then any lower bound on the number of
+comparisons for puppy-cat-dog also applies to sorting. Given <span
+class="math display"><em>N</em></span> items, there are <span
+class="math display"><em>N</em>!</span> permutations, meaning we need
+<span class="math display"><em>l</em><em>g</em>(<em>N</em>!)</span>
+questions to win the game of puppy-cat-dog, and by extension, we need at
+least <span
+class="math display"><em>l</em><em>g</em>(<em>N</em>!)</span> to sort
+<span class="math display"><em>N</em></span> items with yes/no
+questions. Since <span
+class="math display"><em>l</em><em>o</em><em>g</em>(<em>N</em>!) = <em>Θ</em>(<em>N</em>log <em>N</em>)</span>,
+we can say that the hypothetical best sorting algorithm that uses yes/no
+questions requires <span
+class="math display"><em>Ω</em>(<em>N</em>log <em>N</em>)</span> yes/no
+questions. Thus, there is no comparison based algorithm that has a worst
+case that is a better order of growth than <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+compares.</p>
+<h1 id="exercises">32.5 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>Which of the following function(s) have the slowest order of growth
+in terms of Big Theta?
+<ul class="task-list">
+<li><label><input type="checkbox" /><span
+class="math display"><em>N</em>log <em>N</em></span></label></li>
+<li><label><input type="checkbox" /> <span
+class="math display">log <em>N</em>!</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>N</em><sup>2</sup></span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>N</em>!log <em>N</em>!</span></label></li>
+</ul></li>
+<li>To solve puppy, cat, dog for 12 items, what is the theoretical
+minimum number of comparisons we have to make, based on the argument
+used in lecture? Please round your answer up to the nearest whole
+number.</li>
+<li>Which of the following statements are true?
+<ul class="task-list">
+<li><label><input type="checkbox" />The optimal sorting algorithm takes
+at most <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+time.</label></li>
+<li><label><input type="checkbox" />It is impossible to find a
+comparison-based sorting algorithm that takes less than <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+comparisons.</label></li>
+<li><label><input type="checkbox" />It is impossible to find a
+comparison-based sorting algorithm that takes less than <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+time.</label></li>
+<li><label><input type="checkbox" />It is impossible to find a sorting
+algorithm that takes less than <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+time.</label></li>
+</ul></li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>In lecture, we proved that <span
+class="math display">log <em>N</em>! ∈ <em>Θ</em>(<em>N</em>log <em>N</em>)</span>.
+Thus, both <span class="math display"><em>N</em>log <em>N</em></span>
+and <span class="math display">log <em>N</em>!</span> have the same
+order of growth, and are slower than <span
+class="math display"><em>N</em><sup>2</sup></span> or <span
+class="math display"><em>N</em>!log <em>N</em>!</span>.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" /><span
+class="math display"><em>N</em>log <em>N</em></span></label></li>
+<li><label><input type="checkbox" checked="" /><span
+class="math display">log <em>N</em>!</span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>N</em><sup>2</sup></span></label></li>
+<li><label><input type="checkbox" /><span
+class="math display"><em>N</em>!log <em>N</em>!</span></label></li>
+</ul>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p><span
+class="math display"><em>c</em><em>e</em><em>i</em><em>l</em>(log<sub>2</sub>12!) = 29</span>,
+based on the equation we saw in lecture.</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" /><strong>The optimal
+sorting algorithm takes at most</strong> <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+<strong>time</strong>. We know of several sorts (for example, mergesort)
+that take <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span> time in
+the worst case. So the hypothetical “best” sorting algorithm cannot be
+worse than this.</label></li>
+<li><label><input type="checkbox" checked="" /><strong>It is impossible
+to find a comparison-based sorting algorithm that takes less
+than</strong> <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+<strong>comparisons.</strong> This is the comparison sorting bound
+proved in lecture.</label></li>
+<li><label><input type="checkbox" checked="" /><strong>It is impossible
+to find a comparison-based sorting algorithm that takes less
+than</strong> <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+<strong>time</strong>. Each comparison must take at least constant time,
+so the time complexity of comparison-based sorts has the same lower
+bound as the number of comparisons.</label></li>
+<li><label><input type="checkbox" /><strong>It is impossible to find a
+sorting algorithm that takes less than</strong> <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>
+<strong>time.</strong> The lower bound proved in lecture only applies to
+comparison-based sorts. We will see in future lectures how to use
+non-comparison sorts to reduce this runtime even further.</label></li>
+</ul>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Suppose we add a new method to <code>Arrays.sort</code> that takes
+in an array of strings. What algorithm should
+<code>Arrays.sort(String[] x)</code> use?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Quicksort. We don’t need stability, since strings are only equal by
+<code>.equals</code> if they are exactly the same. Quicksort, then, is
+the best algorithm since it is empirically the fastest.</p>
+</details>
+<h1 id="sorting-and-algorithmic-bounds">32. Sorting and Algorithmic
+Bounds</h1>
