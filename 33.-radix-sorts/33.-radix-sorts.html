@@ -1,0 +1,265 @@
+<h1 id="counting-sort">33.1 Counting Sort</h1>
+<p>Imagine if instead of driving a slow Honda Civic, we started driving
+a fast Ferrari. Unfortunately, we won’t actually be driving in a Ferrari
+today, but we will witness a blazing fast algorithm that’s just as fast
+called Radix Sorts. </p>
+<p>When sorting an array, sorting requires <span
+class="math display"><em>Ω</em>(<em>N</em>log <em>N</em>)</span>compare
+operations in the worst case (array is sorted in descending order).
+Thus, the ultimate comparison based sorting algorithm has a worst case
+runtime of <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>.</p>
+<p>From an asymptotic perspective, that means no matter how clever we
+are, we can never beat Merge Sort’s worst case runtime of <span
+class="math display"><em>Θ</em>(<em>N</em>log <em>N</em>)</span>. But
+what if we don’t compare at all?</p>
+<p> </p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-15 at 2.26.42 AM.png" alt="">
+<figcaption>
+<p>
+Left is original, right is ordered output
+</p>
+</figcaption>
+</figure>
+<p>Essentially what just happened is that we first made a new array of
+the same size and then just copied all of the # indexes to the correct
+location. So first we look at 5 Sandra Vanilla Grimes and then copy this
+over to the 5th index in our new array.</p>
+<p>This does guarantee <span
+class="math display"><em>Θ</em>(<em>N</em>)</span> worst case time.
+However what if we were working with </p>
+<ul>
+<li>Non-unique keys.</li>
+<li>Non-consecutive keys.</li>
+<li>Non-numerical keys.</li>
+</ul>
+<p>All of these cases are complex cases that aren’t so simple to deal
+with. Essentially what we can do is create a simpler method which is
+to:</p>
+<ul>
+<li>Count number of occurrences of each item.</li>
+<li>Iterate through list, using count array to decide where to put
+everything.</li>
+</ul>
+<p>Bottom line, we can use counting sort to sort <span
+class="math display"><em>N</em></span> objects in <span
+class="math display"><em>Θ</em>(<em>N</em>)</span> time. </p>
+<h1 id="lsd-radix-sort">33.2 LSD Radix Sort</h1>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-15 at 2.44.24 AM.png" alt="">
+<figcaption>
+<p>
+Least Significant Digit Radix Sort – Using Count Sort
+</p>
+</figcaption>
+</figure>
+<p>Notice in the above picture that we had a completely random input of
+numbers 22, 34, 41, etc. Then in the second box, we had sorted by right
+most digit, so 41, 41, 31 would come first as 1 is the lowest rightmost
+digit. Next would come 32, 22, 12, as 2 is the second least rightmost
+digit. Notice that we still have to take care of sorting 32, 22, and 12
+which is why we move to the second right most digit in our last box
+which has everything sorted. </p>
+<p>What is the runtime of LSD sort?</p>
+<ul>
+<li><span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em> + <em>W</em><em>R</em>)</span></li>
+<li><span class="math display"><em>N</em></span>: Number of items, <span
+class="math display"><em>R</em></span>: size of alphabet, <span
+class="math display"><em>W</em></span>: Width of each item in #
+digits</li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-15 at 2.49.06 AM.png" alt="">
+<figcaption>
+<p>
+Non-equal Key Lengths
+</p>
+</figcaption>
+</figure>
+<h1 id="msd-radix-sort">33.3 MSD Radix Sort</h1>
+<details>
+<summary>
+Suppose we sort by topmost digit, then middle digit, then rightmost
+digit. Will we arrive at the correct result?
+</summary>
+<p>No, this will result in sorting the array by right most digit only as
+we are not saving the topmost and middle digit.</p>
+</details>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-15 at 2.55.34 AM.png" alt="">
+<figcaption>
+<p>
+MSD Radix Sort (correct edition)
+</p>
+</figcaption>
+</figure>
+<p>Notice first we sorted by leftmost digit. Then we grouped the data by
+the leftmost digit, so one group would start with a’s, then the next
+group would start with b’s, and so on and so forth. Then within our
+subgroups we would order by middle digit, and create newer subgroups.
+And finally we would break this up into further subgroups until we have
+all individual subproblems. This final result would be sorted.</p>
+<h3 id="runtimes">Runtimes</h3>
+<p>Best Case. </p>
+<ul>
+<li>We finish in one counting sort pass, looking only at the top digit:
+<span
+class="math display"><em>Θ</em>(<em>N</em> + <em>R</em>)</span></li>
+</ul>
+<p>Worst Case.</p>
+<ul>
+<li>We have to look at every character, degenerating to LSD sort: <span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em> + <em>W</em><em>R</em>)</span></li>
+</ul>
+<h3 id="summary-of-runtimes">Summary of Runtimes</h3>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-15 at 2.58.27 AM.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h1 id="summary">33.4 Summary</h1>
+<p><strong>Terminology.</strong></p>
+<ul>
+<li>Radix - just another word for ‘base’ as in the base of a number
+system. For example, the radix for words written in lowercase English
+letters is 26. For number written in Arabic numerals it is 10.</li>
+<li>Radix sort - a sort that works with one character at a time (by
+grouping objects that have the same digit in the same position).</li>
+<li>Note: I will use ‘character’ and ‘digit’ interchangably in this
+study guide.</li>
+</ul>
+<p><strong>Counting Sort.</strong> Allows you to sort <span
+class="math display"><em>N</em></span> keys that are integers between
+<span class="math display">0</span> and <span
+class="math display"><em>R</em> − 1</span> in <span
+class="math display"><em>Θ</em>(<em>N</em> + <em>R</em>)</span>time.
+Beats linearithmic lower bound by avoiding any binary compares. This is
+a completely different philosophy for how things should be sorted. This
+is the most important concept for this lecture.</p>
+<p><strong>LSD.</strong> In the LSD algorithm, we sort by each digit,
+working from right to left. Requires examination of <span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em>)</span>digits,
+where <span class="math display"><em>W</em></span>is the length of the
+longest key. Runtime is <span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em> + <em>W</em><em>R</em>)</span>,
+though we usually think of <span class="math display"><em>R</em></span>
+as a constant and just say <span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em>)</span>. The <span
+class="math display"><em>Θ</em>(<em>W</em><em>R</em>)</span> part of the
+runtime is due to the creation fo length <span
+class="math display"><em>R</em></span> arrows for counting sort. We
+usually do LSD sort using counting sort as a subroutine, but it’s worth
+thinking about whether other sorts might work as well.</p>
+<p><strong>LSD vs Comparison Sorting.</strong> Our comparison sorts,
+despite requiring <span
+class="math display"><em>Θ</em>(<em>N</em> * <em>l</em><em>o</em><em>g</em><em>N</em>)</span>
+time, can still be faster than LSD sort. For extremely large N, LSD sort
+will naturally win, but log N is typically pretty small. Know which
+algorithm is best in the two extreme cases of very long dissimilar
+strings and very long, nearly equal strings.</p>
+<p><strong>MSD.</strong> In MSD sorting, we work from left to right, and
+solve each resulting subproblem independently. Thus, for each problem,
+we may have as many as <span class="math display"><em>R</em></span>
+subproblem. Worst case runtime is exactly the same as LSD sort, <span
+class="math display"><em>Θ</em>(<em>W</em><em>N</em> + <em>W</em><em>R</em>)</span>,
+though can be much better. In the very best case, where we only have to
+look at the top character (only possible for <span
+class="math display"><em>R</em> &gt; <em>N</em></span>), we have a
+runtime of <span
+class="math display"><em>Θ</em>(<em>N</em> + <em>R</em>)</span>.</p>
+<h1 id="exercises">33.5 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>If we use counting sort to sort all 61B students by the number of
+siblings they have, how long will the counting array be? Let <span
+class="math display"><em>N</em></span> be the total number of students
+and <span class="math display"><em>M</em></span> be the maximum number
+of siblings a student has.</li>
+<li>When performing a radix sort like LSD or MSD, which of the following
+sorting algorithms could we use for each digit?
+<ul class="task-list">
+<li><label><input type="checkbox" />Counting sort</label></li>
+<li><label><input type="checkbox" />Heapsort</label></li>
+<li><label><input type="checkbox" />Mergesort</label></li>
+<li><label><input type="checkbox" />Selection sort</label></li>
+</ul></li>
+<li>If we’re sorting N lowercase english strings using MSD sort, what is
+the maximum number of subproblems after considering only the the most
+significant digit?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>The counting array will have <span
+class="math display"><em>M</em></span> entries. In general for counting
+sort, the count array’s length only needs to be equal to the maximum
+number of unique elements we are counting.</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>Recall that the sub-sort for each digit must be stable. This rules
+out heapsort and selection sort.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" />Counting
+sort</label></li>
+<li><label><input type="checkbox" />Heapsort</label></li>
+<li><label><input type="checkbox" checked="" />Mergesort</label></li>
+<li><label><input type="checkbox" />Selection sort</label></li>
+</ul>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>26, since there are 26 possible values for the first digit we’re
+sorting on.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>What are some advantages of counting sort over quicksort?</li>
+<li>Why do we use LSD over counting sort?</li>
+<li>If we use MSD radix sort, we start with a single problem of size N,
+where N is the number of strings. Depending on the results on the most
+significant digit, we end up with a larger number of smaller
+subproblems, i.e. we’re doing some divide and conquer. In the worst
+case, we end up with only one subproblem, also of size N. When does this
+happen?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>Many correct answers, but some advantages include:</p>
+<ul>
+<li>For sufficiently large N, counting sort is faster (since it is
+linear as compared to N log N).</li>
+<li>Counting sort is stable, since we scan from the first element to the
+last.</li>
+<li>Counting sort doesn’t use comparisons between elements, which might
+be useful if elements are not comparable.</li>
+</ul>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>Counting sort is technically faster than LSD, since counting sort
+doesn’t require splitting up items by digits/letters. However, counting
+sort can require extremely large amounts of memory in some cases (for
+example, when sorting <code>String</code>s, you need one entry in an
+array for every possible <code>String</code>). </p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>This happens when items start with the same digit. In this case, all
+items end up in the same subgroup after the first iteration of MSD, and
+we recurse on a problem of size N.</p>
+</details>
+<h1 id="radix-sorts">33. Radix Sorts</h1>

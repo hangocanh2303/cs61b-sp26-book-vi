@@ -1,0 +1,389 @@
+<h1 id="radix-vs.-comparison-sorting">34.1 Radix vs. Comparison
+Sorting</h1>
+<h2 id="intuitive-analysis">Intuitive Analysis</h2>
+<h3 id="merge-sort-runtime">Merge Sort Runtime</h3>
+<p>Merge Sort requires Θ(N log N) compares.</p>
+<p>A key concept here is that Merge Sort’s runtime on strings of length
+W is Θ(N log N) if each comparison takes constant time or Θ(WN log N) if
+each comparison takes Θ(W) time. </p>
+<p>Example of Θ(N log N): Strings are all different in top character.
+</p>
+<p>Example of Θ(WN log N): Strings are all equal.</p>
+<h3 id="lsd-vs.-merge-sort">LSD vs. Merge Sort</h3>
+<p>The facts:</p>
+<p>Treating alphabet size as constant, LSD Sort has runtime Θ(WN). Merge
+Sort has runtime between Θ(N log N) and Θ(WN log N).</p>
+<p>Which is better? It depends.</p>
+<h4 id="when-might-lsd-sort-be-faster">When might LSD sort be
+faster?</h4>
+<ul>
+<li>When W is sufficiently smaller than N (or equivalently, N is really
+really big, or as you get to larger and larger numbers of strings, we
+expect LSD to pull ahead).</li>
+<li>Worst case strings for mergesort, the more similar they are, the
+more we expect LSD sort to do better. </li>
+<li>Sufficiently large N.</li>
+<li>If strings are very similar to each other.
+<ul>
+<li> Each Merge Sort comparison costs Θ(W) time.</li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (74).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h4 id="when-might-merge-sort-be-faster">When might Merge Sort be
+faster?</h4>
+<ul>
+<li>Strings are different, especially at the beginning.</li>
+<li>If strings are highly dissimilar from each other
+<ul>
+<li>Each merge sort comparison is very fast</li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (137).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h2 id="cost-model-analysis">Cost Model Analysis</h2>
+<h3 id="alternate-approach-picking-a-cost-model">Alternate Approach:
+Picking a Cost Model</h3>
+<p>An alternate approach is to pick a cost model.</p>
+<ul>
+<li>We’ll use number of characters examined.</li>
+<li>By “examined”, we mean:
+<ul>
+<li>Radix Sort: Calling charAt in order to count occurrences of each
+character.</li>
+<li>Merge Sort: Calling charAt in order to compare two Strings.</li>
+</ul></li>
+</ul>
+<h3 id="msd-vs.-mergesort">MSD vs. Mergesort</h3>
+<p>Suppose we have 100 strings of 1000 characters each.</p>
+<p>For MSD Radix Sort, in the worst case (all strings equal), every
+character is examined exactly once. Thus, we have exactly 100,000 total
+character examinations.</p>
+<figure>
+<img src="../.gitbook/assets/image (144).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>For Merge Sort, estimate the total number of characters examined if
+all strings are equal.</p>
+<p>Merging 100 items, assuming equal items results in always picking
+left:</p>
+<ul>
+<li>Comparing A[0] to A[50]: 2000 character examinations.</li>
+<li>Comparing A[1] to A[50]: 2000 character examinations.</li>
+<li>… Comparing A[49] to A[50]: 2000 character examinations.</li>
+<li>Total characters examined: 50 * 2000 = 100000.</li>
+<li>Merging N strings of 1000 characters requires N/2 * 2000 = 1000N
+examinations.</li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/screenshot 2023-04-19 at 12.46.58 AM.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<p>In total, we must examine approximately 1000N log2 N total
+characters.</p>
+<ul>
+<li>100000 + 50000*2 + 25000 * 4 + … = ~660,000 characters.</li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (156).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h3 id="msd-vs.-mergesort-character-examinations">MSD vs. Mergesort
+Character Examinations</h3>
+<p>For N equal strings of length 1000, we found that:</p>
+<ul>
+<li><p>MSD radix sort will examine ~1000N characters (For N= 100:
+100,000).</p></li>
+<li><p>Merge sort will examine ~1000Nlog2(N) characters (For N=100:
+660,000).<br />
+</p>
+<p>If character examination are an appropriate cost model, we’d expect
+Merge Sort to be slower by a factor of log2N.<br />
+</p>
+<p>To see if we’re right, we’ll need to do a computational
+experiment.</p></li>
+</ul>
+<h2 id="empirical-study-radix-sort-vs.-comparison-sorting">Empirical
+Study: Radix Sort vs. Comparison Sorting</h2>
+<h3 id="computational-experiment-results-your-answers">Computational
+Experiment Results (Your Answers)</h3>
+<p>Computational experiment for W = 100.</p>
+<ul>
+<li><a
+href="https://algs4.cs.princeton.edu/51radix/MSD.java.html">MSD</a> and
+<a
+href="https://algs4.cs.princeton.edu/22mergesort/MergeX.java.html">merge
+sort</a> implementations are highly optimized versions taken from our
+optional algorithms textbook.</li>
+<li>Does our data match our runtime hypothesis? No! Why not?
+<ul>
+<li>Maybe when MSD makes partitions, the divide and conquer cost is not
+accounted for.</li>
+<li>Is mergesort optimized to do the timesort optimization?
+Unclear.</li>
+<li>Maybe this is caching performance, Josh mentioned MSD has bad cache
+performance.</li>
+<li>Maybe string comparison is not linear time somehow (keep in mind
+every string compare does the SAME thing. Repeated work on real machines
+these days tends to get optimized away).</li>
+<li>Our cost model isn’t representative of everything that is
+happening.</li>
+<li>One particularly thorny issue: <strong>The “Just In Time”
+Compiler.</strong></li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (77).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<figure>
+<img src="../.gitbook/assets/screenshot 2023-04-19 at 1.01.54 AM.png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h1 id="the-just-in-time-compiler">34.2 The Just-In-Time Compiler</h1>
+<p>Java’s Just-In-Time Compiler secretly optimizes your code when it
+runs.</p>
+<ul>
+<li>The code you write is not necessarily the code that executes!</li>
+<li>As your code runs, the “interpreter” is watching everything that
+happens.
+<ul>
+<li>If some segment of code is called many times, the interpreter
+actually studies and re-implements your code based on what it learned by
+watching WHILE ITS RUNNING (!!).
+<ul>
+<li>Example: Performing calculations whose results are unused.</li>
+<li>See <a href="https://www.youtube.com/watch?v=oH4_unx8eJQ">this
+video</a> if you’re curious.</li>
+</ul></li>
+</ul></li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (143).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h2 id="jit-example">JIT Example</h2>
+<p>The code below creates Linked Lists, 1000 at a time.</p>
+<ul>
+<li>Repeating this 500 times yields an interesting result.</li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (67).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<ul>
+<li>First optimization: Not sure what it does.</li>
+<li>Second optimization: Stops creating linked lists since we’re not
+actually using them.</li>
+</ul>
+<figure>
+<img src="../.gitbook/assets/image (95).png" alt="">
+<figcaption>
+</figcaption>
+</figure>
+<h2 id="so-which-is-better-msd-or-mergesort">… So Which is Better? MSD
+or MergeSort?</h2>
+<p>The performance of the merge sort algorithm is highly dependent on
+the presence of just-in-time (JIT) compilation. Specifically, when JIT
+is enabled, merge sort is faster in cases where the strings being sorted
+are equal, but slower when JIT is disabled. This suggests that merge
+sort is generally more effective for this specific case, given that JIT
+is typically enabled. However, there are numerous other scenarios to
+consider, including the sorting of almost equal strings, randomized
+strings, and real-world data from specific datasets. When assessing the
+effectiveness of merge sort for these alternative cases, it is important
+to conduct careful experimentation and profiling to determine which
+sorting algorithm is most suitable. The lectureCode repository provides
+code for running these experiments, allowing for more precise assessment
+of algorithm performance under various conditions. Ultimately,
+real-world applications will require a thorough analysis of different
+implementations on actual data in order to select the optimal algorithm
+for the task at hand.</p>
+<h2 id="bottom-line-algorithms-can-be-hard-to-compare">Bottom Line:
+Algorithms Can Be Hard to Compare</h2>
+<p>Comparing algorithms that have the same order of growth can be a
+difficult task, as it requires conducting computational experiments to
+determine their relative performance. However, modern programming
+environments can introduce additional challenges to this process, as
+certain optimizations such as just-in-time (JIT) compilation in Java can
+impact the results of experiments. It is worth noting that even small
+optimizations to an algorithm can have a significant impact on its
+performance. For instance, a change to the Quicksort algorithm suggested
+by Vladimir Yaroslavskiy has been shown to provide notable improvements,
+as discussed briefly in the Quicksort lecture. Therefore, when comparing
+algorithms with similar growth rates, it is crucial to remain vigilant
+of potential optimizations and variations that may influence their
+performance.</p>
+<h2 id="jit-compilers-are-always-evolving">JIT Compilers Are Always
+Evolving</h2>
+<p>The JIT (just-in-time) compiler is a highly complex and essential
+component of modern compilers, and is an active area of research and
+development in this field. However, the older JIT compiler known as C2
+has become increasingly difficult to maintain and extend, with no major
+improvements implemented in recent years. The codebase for C2 is written
+in a specific dialect of C++, making it challenging for new engineers to
+understand and work with. As a result, the codebase is being abandoned
+in favor of newer and more maintainable alternatives. For individuals
+interested in this area of study, CS164 offers a course on compilers and
+there are opportunities for involvement in ongoing research. It is worth
+noting that the reasons for the improved performance of merge sort with
+the JIT are not yet fully understood, making it an interesting topic for
+further research.</p>
+<h1 id="radix-sorting-integers">34.3 Radix Sorting Integers</h1>
+<p>{% hint style=“info” %} BTW: A 32-bit integer is a normal integer in
+Java and other programming languages that spans 4 billion values. This
+is something we learned in Hashing chapter 20 and is a 61C concept! {%
+endhint %}</p>
+<h3 id="summary-of-video-above">Summary of Video above</h3>
+<p>Barack Obama gets a Google Interview question: What is the most
+efficient way to sort a million 32-bit integers? Obama says that he
+would recommend not using Bubble sort! That’s right folks! Obama knows
+his 61B :smile:.</p>
+<h3 id="whats-the-answer">What’s the answer?</h3>
+<p>The answer to this question actually is Radix sort because we know
+that in a very large N limit, Radix sort is simply fastest as it is
+linear with runtime Θ(WN) where W is the number of digits and N is the
+number of integers we are sorting. This is much faster than any
+Comparison Sort we learned about since the fastest runtimes seem to be
+Θ(N*log(N)).</p>
+<h3 id="but-how-do-we-do-it">But how do we do it?</h3>
+<p>We don’t have a charAt() for every integer. And if we converted all
+integers to strings, that’s a very time expensive operation as well. So
+how would you LSD radix sort an array of integers? Instead of using
+charAt, maybe write a helper method like getDthDigit(int N, int d).
+Example: getDthDigit(15009, 2) = 5.</p>
+<h3 id="lsd-radix-sort-on-integers">LSD Radix Sort on Integers</h3>
+<p>Note that we don’t have to work with base 10. What we can instead do
+is increase this base to have less digits in our total number. This is
+really getting into 61C territory as we haven’t really discussed binary
+representation of integers yet, but essentially what we want to do is
+convert to hexadecimal, a base 16 number that is represented with the
+following digits: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F}. Note
+that A is 10 and F is 15. 0 - 15 is 16 possible values for a digit! To
+convert a number from decimal (base 10) to hexadecimal (base 16), we do
+the following:</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-19 at 1.18.26 AM.png" alt="">
+<figcaption>
+<p>
+Decimal to Hexadecimal
+</p>
+</figcaption>
+</figure>
+<p>Notice that our original number had 6 digits in base 10 and our
+resulting number has 5 digits! Notice we don’t have to go to just base
+16. We can go even bigger to base 256 to only have 3 digits! There are
+small yet amazing optimizations!</p>
+<figure>
+<img src="../.gitbook/assets/Screen Shot 2023-04-19 at 1.21.11 AM.png" alt="">
+<figcaption>
+<p>
+Decimal to Ducentohexaquinquagesimal (Base 256)
+</p>
+</figcaption>
+</figure>
+<p>Please do not worry about memorizing what “ducentohexaquinquagesimal”
+is. The only important thing to learn here is that this conversion to
+higher bases may result in fewer digits for our LSD and MSD Radix sorts
+to have faster traversals.</p>
+<p>However, there is a tradeoff between W, the size of each integer, and
+the size of the array we need to maintain the counts. The most oprtimal
+is actually base 256!</p>
+<h1 id="summary">34.4 Summary</h1>
+<p><strong>Radix Sort vs. Comparison Sorts.</strong> In lecture, we used
+the number of characters examined as a cost model to compare radix sort
+and comparison sort. For MSD Radix Sort, the worst case is that each
+character is examined once for NM characters examined. For merge sort,
+MNlogN is the worst case characters examined. Thus, we can see that
+merge sort is slower by a factor of logN if character comparisons are an
+appropriate cost model. Using an empirical analysis, however, we saw
+that this does not hold true because of lots of background reasons such
+as the cache, optimized methods, extra copy operations, and overall
+because our cost model does not account for everything happening.</p>
+<p><strong>Just-In-Time Compiler.</strong> The “interpreter” studies
+your code as it runs so that when a sequence of code is run many times,
+it studies and re-implements based on what it learns while running to
+optimize it. For example, if a LinkedList is created many times in a
+loop and left unused, it eventually learns to stop creating the
+LinkedLists since they are never used. With the Just-In-Time compiler
+disabled, merge sort, from the previous section, is indeed slower than
+MSD Radix Sort.</p>
+<p><strong>Radix Sorting Integers.</strong> When radix sorting integers,
+we no longer have a charAt method. There are lots of alternative options
+are stilizing mods and division to write your own getDigit() method or
+to make each Integer into a String. However, we don’t actually have to
+stick to base 10 and can instead treat the numbers as base 16, 256, or
+even base 65536 numbers. Thus, we can reduce the number of digits, which
+can reduces the runtime since runtime for radix sort depends on alphabet
+size.</p>
+<h1 id="exercises">34.5 Exercises</h1>
+<h2 id="factual">Factual</h2>
+<ol type="1">
+<li>What happens when a Java file is compiled? HINT: Think about
+<code>.java</code> and <code>.class</code> files.</li>
+<li>Why can a block of code run faster the second time it executes as
+compared to the first time?</li>
+<li>What’s the optimal way to sort an array of integers? Assume the
+integers are uniformly randomly distributed.</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>When a Java file is compiled, it is transformed from its
+human-readable <code>.java</code> source code format into byte code in a
+<code>.class</code> file format that can be executed by the Java Virtual
+Machine (JVM).</p>
+</details>
+<details>
+<summary>
+Problem 2
+</summary>
+<p>If some segment of code is called many times, the interpreter studies
+and re-implements your code based on what is observed while the code is
+running. For example, if you create many unused data structures, they
+might be optimized out of your code.</p>
+</details>
+<details>
+<summary>
+Problem 3
+</summary>
+<p>As we saw in lecture, LSD sort outperforms quicksort for an array of
+integers, particularly if we optimize for a better base than base
+10.</p>
+</details>
+<h2 id="metacognitive">Metacognitive</h2>
+<ol type="1">
+<li>Under what conditions would LSD sort be faster than mergesort?</li>
+</ol>
+<details>
+<summary>
+Problem 1
+</summary>
+<p>There are two main cases when LSD sort is much faster than mergesort:
+when there are a large number of strings (large N), and when all strings
+are very similar to each other.</p>
+<p>When N is really large, we see the asymptotic behavior of LSD sort
+beat the asymptotic behavior of merge sort, which is slower with a
+runtime of <span
+class="math display"><em>N</em>log <em>N</em></span>.</p>
+<p>When the strings are very similar, then each comparison in merge sort
+is slow, roughly linear time in the length of the string. Instead of
+comparing each letter in each string at every merge, LSD only examines
+the letters of each string once.</p>
+</details>
+<h1 id="sorting-and-data-structures-conclusion">34. Sorting and Data
+Structures Conclusion</h1>
